@@ -596,6 +596,39 @@ class ModelShowcase {
         });
 
         if (!response.ok) {
+            // Handle 409 conflict (sha mismatch) by fetching latest sha and retrying once
+            if (response.status === 409) {
+                try {
+                    const latestRes = await fetch(apiUrl, {
+                        headers: { 'Authorization': `token ${githubToken}` }
+                    });
+                    if (latestRes.ok) {
+                        const latestJson = await latestRes.json();
+                        const retryBody = {
+                            message: `Update ${path}`,
+                            content: base64Content,
+                            sha: latestJson.sha
+                        };
+                        const retry = await fetch(apiUrl, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `token ${githubToken}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(retryBody)
+                        });
+                        if (!retry.ok) {
+                            const retryErr = await retry.text();
+                            throw new Error(`GitHub upload failed after retry: ${retry.status} - ${retryErr}`);
+                        }
+                        const retryResult = await retry.json();
+                        return retryResult.content.download_url;
+                    }
+                } catch (e) {
+                    const msg = await response.text().catch(()=> '');
+                    throw new Error(`GitHub upload failed: 409 - ${msg}`);
+                }
+            }
             const error = await response.text();
             throw new Error(`GitHub upload failed: ${response.status} - ${error}`);
         }
