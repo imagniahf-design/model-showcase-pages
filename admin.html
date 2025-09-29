@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Private Model Page Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .container { max-width: 600px; margin: 2em auto; background: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 2px 8px #0001; }
+    .hidden { display: none; }
+    .output-area textarea { width: 100%; height: 300px; }
+    .file-list { margin: 1em 0; }
+    .file-list li { margin-bottom: 0.5em; }
+    .filename-edit { width: 220px; padding: 0.3em; font-size: 1em; }
+    .label { font-weight: 600; margin-bottom: 0.3em; display: block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>3D Model Page Generator (Private)</h1>
+    <div id="password-area">
+      <label>Enter admin password:</label>
+      <input type="password" id="admin-pass">
+      <button onclick="checkPassword()">Login</button>
+    </div>
+    <div id="main-area" class="hidden">
+      <label class="label">Model Title:</label>
+      <input type="text" id="model-title" placeholder="Enter Model Title" style="width:100%;margin-bottom:1em;">
+      <label class="label">Upload 3D Model Files (.glb and/or .usdz):</label>
+      <div id="drop-zone" style="border:2px dashed #007bff;padding:2em;text-align:center;cursor:pointer;">
+        Drag & drop files here or <input type="file" id="fileInput" multiple accept=".glb,.usdz">
+      </div>
+      <ul class="file-list" id="file-list"></ul>
+      <button id="generate-btn" disabled>Generate Model Page</button>
+      <div class="output-area hidden" id="output-area">
+        <h2>Copy this HTML and save as <span id="filename"></span> in /models/</h2>
+        <textarea id="output-html" readonly></textarea>
+        <p>Also save your uploaded files in <code>/models/</code> with the same names.</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Simple password protection (not secure for secrets!)
+    const PASSWORD = "My birthday1."; // CHANGE THIS
+    function checkPassword() {
+      const input = document.getElementById("admin-pass").value;
+      if (input === PASSWORD) {
+        document.getElementById("password-area").classList.add("hidden");
+        document.getElementById("main-area").classList.remove("hidden");
+      } else {
+        alert("Wrong password!");
+      }
+    }
+
+    // File handling
+    let modelFiles = {}; // { glb: {name, file}, usdz: {name, file} }
+    function handleFiles(files) {
+      for (const f of files) {
+        if (f.name.endsWith(".glb")) modelFiles.glb = { name: f.name, file: f };
+        if (f.name.endsWith(".usdz")) modelFiles.usdz = { name: f.name, file: f };
+      }
+      updateFileList();
+      checkReady();
+    }
+
+    // Drag & drop
+    document.getElementById("drop-zone").addEventListener("dragover", e => {
+      e.preventDefault();
+      e.currentTarget.style.background = "#e2eefd";
+    });
+    document.getElementById("drop-zone").addEventListener("dragleave", e => {
+      e.preventDefault();
+      e.currentTarget.style.background = "";
+    });
+    document.getElementById("drop-zone").addEventListener("drop", e => {
+      e.preventDefault();
+      e.currentTarget.style.background = "";
+      handleFiles(e.dataTransfer.files);
+    });
+
+    // File input
+    document.getElementById("fileInput").addEventListener("change", function(e) {
+      handleFiles(e.target.files);
+    });
+
+    // File list UI, with editable filenames
+    function updateFileList() {
+      const ul = document.getElementById("file-list");
+      ul.innerHTML = "";
+      if (modelFiles.glb) {
+        ul.innerHTML += `<li>GLB: <input class="filename-edit" type="text" value="${modelFiles.glb.name}" onchange="updateFilename('glb', this.value)"></li>`;
+      }
+      if (modelFiles.usdz) {
+        ul.innerHTML += `<li>USDZ: <input class="filename-edit" type="text" value="${modelFiles.usdz.name}" onchange="updateFilename('usdz', this.value)"></li>`;
+      }
+    }
+
+    window.updateFilename = function(type, newName) {
+      if (modelFiles[type]) modelFiles[type].name = newName;
+    }
+
+    function checkReady() {
+      // At least one file and non-empty title
+      const btn = document.getElementById("generate-btn");
+      const title = document.getElementById("model-title").value.trim();
+      btn.disabled = !(title && (modelFiles.glb || modelFiles.usdz));
+    }
+
+    document.getElementById("model-title").addEventListener("input", checkReady);
+
+    document.getElementById("generate-btn").onclick = function() {
+      const title = document.getElementById("model-title").value.trim() || "My 3D Model";
+      const glb = modelFiles.glb ? `src=\"../models/${modelFiles.glb.name}\"` : "";
+      const usdz = modelFiles.usdz ? `ios-src=\"../models/${modelFiles.usdz.name}\"` : "";
+      // Random filename based on title
+      const safeTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      const unique = Date.now().toString(36);
+      const filename = \\`${safeTitle || "model"}-${unique}.html\``;
+      document.getElementById("filename").textContent = filename;
+
+      const html = `<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>${title} | AR Model Viewer</title>\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <script type=\"module\" src=\"https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js\"></script>\n  <link rel=\"stylesheet\" href=\"../style.css\">\n  <style>\n    body {\n      background: linear-gradient(120deg, #e9f1fc 0%, #f7fafd 100%);\n      margin: 0;\n      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;\n      color: #23395d;\n      min-height: 100vh;\n    }\n    .container {\n      max-width: 500px;\n      margin: 3em auto 2em auto;\n      background: #fff;\n      border-radius: 20px;\n      box-shadow: 0 8px 32px rgba(35, 57, 93, 0.12);\n      padding: 2em 2em 2.5em 2em;\n      display: flex;\n      flex-direction: column;\n      align-items: center;\n    }\n    header {\n      width: 100%;\n      text-align: center;\n      margin-bottom: 1.5em;\n    }\n    header h1 {\n      font-size: 2em;\n      font-weight: 700;\n      margin: 0 0 0.5em 0;\n      background: linear-gradient(90deg, #007bff 40%, #6cc5ff 100%);\n      -webkit-background-clip: text;\n      -webkit-text-fill-color: transparent;\n      background-clip: text;\n      text-fill-color: transparent;\n      letter-spacing: 0.025em;\n    }\n    model-viewer {\n      border-radius: 12px;\n      box-shadow: 0 4px 24px rgba(35, 57, 93, 0.08);\n      background: #f6fafe;\n      width: 100%;\n      max-width: 400px;\n      height: 360px;\n      margin-bottom: 1.2em;\n      display: block;\n    }\n    .ar-btn {\n      background: linear-gradient(90deg, #007bff 70%, #6cc5ff 100%);\n      color: #fff;\n      border: none;\n      border-radius: 100px;\n      padding: 1em 2.2em;\n      cursor: pointer;\n      font-size: 1.1em;\n      font-weight: 600;\n      box-shadow: 0 2px 12px rgba(35, 57, 93, 0.08);\n      transition: background .2s, box-shadow .2s;\n      margin: 1.5em auto 0 auto;\n      display: block;\n    }\n    .ar-btn:hover,\n    .ar-btn:focus {\n      background: linear-gradient(90deg, #0056b3 70%, #009cff 100%);\n      box-shadow: 0 4px 16px rgba(35, 57, 93, 0.18);\n      outline: none;\n    }\n    section {\n      width: 100%;\n      margin-top: 2em;\n      text-align: center;\n    }\n    section h2 {\n      font-size: 1.1em;\n      font-weight: 500;\n      margin-bottom: 0.8em;\n      color: #007bff;\n      letter-spacing: 0.02em;\n    }\n    .share-link-row {\n      display: flex;\n      align-items: center;\n      gap: 0.5em;\n      justify-content: center;\n      margin-top: 0.5em;\n      flex-wrap: wrap;\n    }\n    #shareLink {\n      border: 1px solid #b3d0ee;\n      border-radius: 6px;\n      padding: 0.5em 1em;\n      font-size: 1em;\n      width: 230px;\n      background: #f6fafe;\n      color: #23395d;\n      transition: border .2s;\n    }\n    #shareLink:focus {\n      border: 1.5px solid #007bff;\n      outline: none;\n    }\n    button.copy-btn {\n      padding: 0.5em 1.2em;\n      font-size: 1em;\n      border-radius: 100px;\n      border: none;\n      background: #e1f0ff;\n      color: #007bff;\n      cursor: pointer;\n      font-weight: 500;\n      transition: background .2s, color .2s;\n    }\n    button.copy-btn:hover {\n      background: #007bff;\n      color: #fff;\n    }\n    footer {\n      text-align: center;\n      color: #6a99d7;\n      font-size: 0.95em;\n      margin-top: 2em;\n      padding: 1.5em 0 0.6em 0;\n      background: none;\n      border-top: 1px solid #e3eaf7;\n    }\n    @media (max-width: 700px) {\n      .container {\n        max-width: 95vw;\n        padding: 1em 0.4em 1.5em 0.4em;\n      }\n      model-viewer {\n        max-width: 95vw;\n        height: 260px;\n      }\n      #shareLink {\n        width: 140px;\n        font-size: 0.95em;\n      }\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <header>\n      <h1>${title}</h1>\n    </header>\n    <!-- Interactive 3D Preview + AR Button -->\n    <model-viewer\n      ${glb}\n      ${usdz}\n      camera-controls\n      auto-rotate\n      ar\n      ar-modes=\"scene-viewer webxr quick-look\"\n      shadow-intensity=\"1\"\n      alt=\"${title}\">\n      <button slot=\"ar-button\" class=\"ar-btn\">START AR</button>\n    </model-viewer>\n    <section>\n      <h2>Share this model</h2>\n      <div class=\"share-link-row\">\n        <input id=\"shareLink\" type=\"text\" readonly value=\"\">\n        <button class=\"copy-btn\" onclick=\"copyLink()\">Copy Link</button>\n      </div>\n    </section>\n  </div>\n  <footer>\n    &copy; 2025 AR 3D Model Viewer\n  </footer>\n  <script>\n    document.getElementById('shareLink').value = window.location.href;\n    function copyLink() {\n      const link = document.getElementById('shareLink');\n      link.select();\n      document.execCommand('copy');\n    }\n  </script>\n</body>\n</html>`;
+      document.getElementById("output-html").value = html;
+    };
+  </script>
+</body>
+</html>

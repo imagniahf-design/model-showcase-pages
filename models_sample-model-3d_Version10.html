@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sample 3D Model | AR Model Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    body {
+      background: linear-gradient(120deg, #e9f1fc 0%, #f7fafd 100%);
+      margin: 0;
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      color: #23395d;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 500px;
+      margin: 3em auto 2em auto;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(35, 57, 93, 0.12);
+      padding: 2em 2em 2.5em 2em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 1.5em;
+    }
+    header h1 {
+      font-size: 2em;
+      font-weight: 700;
+      margin: 0 0 0.5em 0;
+      background: linear-gradient(90deg, #007bff 40%, #6cc5ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+      letter-spacing: 0.025em;
+    }
+    model-viewer {
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(35, 57, 93, 0.08);
+      background: #f6fafe;
+      width: 100%;
+      max-width: 400px;
+      height: 360px;
+      margin-bottom: 1.2em;
+      display: block;
+    }
+    .ar-btn {
+      background: linear-gradient(90deg, #007bff 70%, #6cc5ff 100%);
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      padding: 1em 2.2em;
+      cursor: pointer;
+      font-size: 1.1em;
+      font-weight: 600;
+      box-shadow: 0 2px 12px rgba(35, 57, 93, 0.08);
+      transition: background .2s, box-shadow .2s;
+      margin: 1.5em auto 0 auto;
+      display: block;
+    }
+    .ar-btn:hover,
+    .ar-btn:focus {
+      background: linear-gradient(90deg, #0056b3 70%, #009cff 100%);
+      box-shadow: 0 4px 16px rgba(35, 57, 93, 0.18);
+      outline: none;
+    }
+    section {
+      width: 100%;
+      margin-top: 2em;
+      text-align: center;
+    }
+    section h2 {
+      font-size: 1.1em;
+      font-weight: 500;
+      margin-bottom: 0.8em;
+      color: #007bff;
+      letter-spacing: 0.02em;
+    }
+    .share-link-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      justify-content: center;
+      margin-top: 0.5em;
+      flex-wrap: wrap;
+    }
+    #shareLink {
+      border: 1px solid #b3d0ee;
+      border-radius: 6px;
+      padding: 0.5em 1em;
+      font-size: 1em;
+      width: 230px;
+      background: #f6fafe;
+      color: #23395d;
+      transition: border .2s;
+    }
+    #shareLink:focus {
+      border: 1.5px solid #007bff;
+      outline: none;
+    }
+    button.copy-btn {
+      padding: 0.5em 1.2em;
+      font-size: 1em;
+      border-radius: 100px;
+      border: none;
+      background: #e1f0ff;
+      color: #007bff;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background .2s, color .2s;
+    }
+    button.copy-btn:hover {
+      background: #007bff;
+      color: #fff;
+    }
+    footer {
+      text-align: center;
+      color: #6a99d7;
+      font-size: 0.95em;
+      margin-top: 2em;
+      padding: 1.5em 0 0.6em 0;
+      background: none;
+      border-top: 1px solid #e3eaf7;
+    }
+    @media (max-width: 700px) {
+      .container {
+        max-width: 95vw;
+        padding: 1em 0.4em 1.5em 0.4em;
+      }
+      model-viewer {
+        max-width: 95vw;
+        height: 260px;
+      }
+      #shareLink {
+        width: 140px;
+        font-size: 0.95em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Sample 3D Model</h1>
+    </header>
+    <!-- Interactive 3D Preview + AR Button -->
+    <model-viewer
+      src="../models/sample-model.glb"
+      ios-src="../models/sample-model.usdz"
+      camera-controls
+      auto-rotate
+      ar
+      ar-modes="scene-viewer webxr quick-look"
+      shadow-intensity="1"
+      alt="Sample 3D Model">
+      <button slot="ar-button" class="ar-btn">START AR</button>
+    </model-viewer>
+    <section>
+      <h2>Share this model</h2>
+      <div class="share-link-row">
+        <input id="shareLink" type="text" readonly value="">
+        <button class="copy-btn" onclick="copyLink()">Copy Link</button>
+      </div>
+    </section>
+  </div>
+  <footer>
+    &copy; 2025 AR 3D Model Viewer
+  </footer>
+  <script>
+    document.getElementById('shareLink').value = window.location.href;
+    function copyLink() {
+      const link = document.getElementById('shareLink');
+      link.select();
+      document.execCommand('copy');
+    }
+  </script>
+</body>
+</html>

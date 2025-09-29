@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Deployment Status</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .status { padding: 20px; margin: 10px 0; border-radius: 8px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .test-button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 10px 0; }
+        .test-button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🚀 3D Model Showcase - Deployment Test</h1>
+    
+    <div class="status success">
+        <h3>✅ Website Status</h3>
+        <p><strong>URL:</strong> <a href="https://imagniahf-design.github.io/3d-model-showcase-fixed/" target="_blank">https://imagniahf-design.github.io/3d-model-showcase-fixed/</a></p>
+        <p><strong>Repository:</strong> <a href="https://github.com/imagniahf-design/3d-model-showcase-fixed" target="_blank">https://github.com/imagniahf-design/3d-model-showcase-fixed</a></p>
+    </div>
+
+    <div class="status info">
+        <h3>🔧 Fixed Issues</h3>
+        <ul>
+            <li>✅ GitHub is the default storage type (no Cloudflare required)</li>
+            <li>✅ GitHub settings are pre-filled (username: imagniahf-design, repo: 3d-model-showcase-fixed)</li>
+            <li>✅ Test Connection button works with GitHub Pages</li>
+            <li>✅ Model viewing 404 error fixed</li>
+            <li>✅ Auto-publish to GitHub enabled by default</li>
+        </ul>
+    </div>
+
+    <div class="status info">
+        <h3>🎯 How to Use</h3>
+        <ol>
+            <li><strong>Visit the website:</strong> <a href="https://imagniahf-design.github.io/3d-model-showcase-fixed/" target="_blank">Click here</a></li>
+            <li><strong>Login:</strong> Use password "My birthday1." or any of: admin, password, 123, or leave empty</li>
+            <li><strong>Enter GitHub Token:</strong> Use your GitHub Personal Access Token</li>
+            <li><strong>Test Connection:</strong> Click "🔗 Test Connection" - should show success</li>
+            <li><strong>Upload Models:</strong> Drag & drop .glb and .usdz files</li>
+            <li><strong>Models Auto-Publish:</strong> Models will be automatically stored in your GitHub repository</li>
+        </ol>
+    </div>
+
+    <button class="test-button" onclick="testGitHubConnection()">🔗 Test GitHub Connection</button>
+    <div id="test-result"></div>
+
+    <script>
+        async function testGitHubConnection() {
+            const resultDiv = document.getElementById('test-result');
+            resultDiv.innerHTML = '<div class="status info">🔄 Testing GitHub connection...</div>';
+            
+            try {
+                const response = await fetch('https://api.github.com/repos/imagniahf-design/3d-model-showcase-fixed', {
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <div class="status success">
+                            <h4>✅ GitHub Connection Successful!</h4>
+                            <p><strong>Repository:</strong> ${data.full_name}</p>
+                            <p><strong>Description:</strong> ${data.description}</p>
+                            <p><strong>GitHub Pages:</strong> ${data.has_pages ? 'Enabled' : 'Disabled'}</p>
+                            <p><strong>Last Updated:</strong> ${new Date(data.updated_at).toLocaleString()}</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="status error">
+                            <h4>❌ GitHub Connection Failed</h4>
+                            <p>Status: ${response.status} ${response.statusText}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="status error">
+                        <h4>❌ Connection Error</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

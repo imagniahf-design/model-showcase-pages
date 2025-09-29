@@ -1,0 +1,15 @@
+body {
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  background: #f7fafd;
+  color: #23395d;
+  margin: 0;
+}
+h1, h2, h3 { font-weight: 700; }
+label { font-weight: 600; }
+input, button, textarea {
+  font-family: inherit;
+  font-size: 1em;
+}
+button {
+  cursor: pointer;
+}
