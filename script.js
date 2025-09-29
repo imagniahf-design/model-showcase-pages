@@ -25,6 +25,10 @@ class ModelShowcase {
             publishOnUpload: true
         };
         this.init();
+        // Internal guards
+        this.eventsBound = false;
+        this.isUploading = false;
+        this.isPublishing = false;
     }
 
     init() {
@@ -44,6 +48,7 @@ class ModelShowcase {
     }
 
     setupEventListeners() {
+        if (this.eventsBound) return; // prevent duplicate bindings
         // Login form
         document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -342,6 +347,7 @@ class ModelShowcase {
                 if (githubRepo) githubRepo.value = this.publishing.githubRepo;
             }
         }
+        this.eventsBound = true;
     }
 
     handleLogin() {
@@ -368,6 +374,11 @@ class ModelShowcase {
     }
 
     async handleFileUpload(files) {
+        if (this.isUploading) {
+            console.warn('Upload already in progress; ignoring new request');
+            return;
+        }
+        this.isUploading = true;
         console.log('Files received:', files);
         console.log('Files array length:', files.length);
         
@@ -394,6 +405,8 @@ class ModelShowcase {
         }
 
         this.showUploadProgress();
+        const uploadContainer = document.getElementById('upload-area');
+        if (uploadContainer) uploadContainer.style.pointerEvents = 'none';
 
         try {
             const modelId = this.generateModelId();
@@ -429,6 +442,8 @@ class ModelShowcase {
             // Auto-publish if configured
             if (this.publishing.publishOnUpload && this.publishing.storageType === 'github') {
                 try {
+                    if (this.isPublishing) throw new Error('A publish is already in progress');
+                    this.isPublishing = true;
                     console.log('Auto-publishing model to GitHub...', {
                         storageType: this.publishing.storageType,
                         hasToken: !!this.publishing.githubToken,
@@ -441,6 +456,8 @@ class ModelShowcase {
                 } catch (error) {
                     console.error('Auto-publish failed:', error);
                     alert(`❌ Auto-publish failed: ${error.message}. You can publish manually later.`);
+                } finally {
+                    this.isPublishing = false;
                 }
             } else {
                 console.log('Auto-publish skipped:', {
@@ -462,6 +479,9 @@ class ModelShowcase {
             console.error('Error stack:', error.stack);
             alert(`Error uploading files: ${error.message}. Please check the console for details.`);
             this.hideUploadProgress();
+        } finally {
+            this.isUploading = false;
+            if (uploadContainer) uploadContainer.style.pointerEvents = '';
         }
     }
 
@@ -519,6 +539,13 @@ class ModelShowcase {
             await this.updateGitHubIndex(model.id);
 
             console.log('Model published successfully to GitHub');
+            // Mark as uploaded in local list
+            const local = this.models.find(m => m.id === model.id);
+            if (local) {
+                local.uploaded = true;
+                this.saveModels();
+                this.loadModels();
+            }
         } catch (error) {
             console.error('Failed to publish model to GitHub:', error);
             throw error;
