@@ -505,6 +505,16 @@ class ModelShowcase {
             // Upload manifest
             const manifestUrl = await this.uploadToGitHub(`models/${model.id}.json`, JSON.stringify(manifest, null, 2));
 
+            // Auto-generate a standalone HTML page for this model and upload it
+            const pageHtml = this.buildStandaloneModelPage({
+                name: model.name,
+                description: model.description || '',
+                glbUrl,
+                usdzUrl,
+                previewImage: posterUrl
+            });
+            await this.uploadToGitHub(`models/${model.id}/index.html`, pageHtml);
+
             // Update index
             await this.updateGitHubIndex(model.id);
 
@@ -518,16 +528,36 @@ class ModelShowcase {
     async uploadToGitHub(path, content) {
         const { githubToken, githubUsername, githubRepo } = this.publishing;
         const apiUrl = `https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/${path}`;
-        
         // Convert content to base64 if it's not already
         let base64Content;
         if (typeof content === 'string' && content.startsWith('data:')) {
             base64Content = content.split(',')[1];
         } else if (typeof content === 'string') {
-            base64Content = btoa(content);
+            base64Content = btoa(unescape(encodeURIComponent(content)));
         } else {
-            base64Content = btoa(content);
+            // Unsupported type; require data URL or string
+            throw new Error('Invalid content type for upload');
         }
+
+        // Check if file exists to include sha for updates (avoid 422)
+        let existingSha = undefined;
+        try {
+            const headRes = await fetch(apiUrl, {
+                headers: { 'Authorization': `token ${githubToken}` }
+            });
+            if (headRes.ok) {
+                const json = await headRes.json();
+                existingSha = json.sha;
+            }
+        } catch (_) {
+            // ignore
+        }
+
+        const putBody = {
+            message: `${existingSha ? 'Update' : 'Add'} ${path}`,
+            content: base64Content,
+            sha: existingSha
+        };
 
         const response = await fetch(apiUrl, {
             method: 'PUT',
@@ -535,10 +565,7 @@ class ModelShowcase {
                 'Authorization': `token ${githubToken}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                message: `Add ${path}`,
-                content: base64Content
-            })
+            body: JSON.stringify(putBody)
         });
 
         if (!response.ok) {
@@ -1165,12 +1192,13 @@ class ModelShowcase {
     }
 
     viewModel(modelId) {
-        const url = `${location.origin}/model.html?id=${encodeURIComponent(modelId)}`;
+        // Prefer the standalone page generated at publish: /models/{id}/
+        const url = `${location.origin}/models/${encodeURIComponent(modelId)}/`;
         window.open(url, '_blank');
     }
 
     copyShareLink(modelId) {
-        const url = `${location.origin}/model.html?id=${encodeURIComponent(modelId)}`;
+        const url = `${location.origin}/models/${encodeURIComponent(modelId)}/`;
         navigator.clipboard.writeText(url).then(() => alert('Share link copied to clipboard!')).catch(() => prompt('Copy this link:', url));
     }
 
@@ -1217,7 +1245,7 @@ class ModelShowcase {
     }
 
     openShareLink(modelId) {
-        const url = `${location.origin}/model.html?id=${encodeURIComponent(modelId)}`;
+        const url = `${location.origin}/models/${encodeURIComponent(modelId)}/`;
         window.open(url, '_blank');
     }
 
@@ -1353,8 +1381,8 @@ class ModelPage {
             id: manifest.id,
             name: manifest.name || manifest.title,
             description: manifest.description,
-            glbUrl: glbUrl,
-            usdzUrl: usdzUrl,
+            glbUrl: glbUrl.startsWith('http') ? glbUrl : `https://raw.githubusercontent.com/${this.publishing.githubUsername || 'imagniahf-design'}/${this.publishing.githubRepo || 'model-showcase-pages'}/main/models/${manifest.id}/model.glb`,
+            usdzUrl: usdzUrl && usdzUrl.startsWith('http') ? usdzUrl : (usdzUrl ? `https://raw.githubusercontent.com/${this.publishing.githubUsername || 'imagniahf-design'}/${this.publishing.githubRepo || 'model-showcase-pages'}/main/models/${manifest.id}/model.usdz` : ''),
             previewImage: manifest.previewImage || manifest.poster
         };
     }
