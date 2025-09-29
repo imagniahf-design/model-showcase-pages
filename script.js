@@ -1302,13 +1302,15 @@ class ModelShowcase {
     }
 
     viewModel(modelId) {
-        // Prefer the standalone page generated at publish: /models/{id}/
-        const url = `${location.origin}/models/${encodeURIComponent(modelId)}/`;
+        // Use project-relative path so it works on GitHub Pages project sites
+        const basePath = window.location.pathname.replace(/[^/]*$/, '');
+        const url = `${basePath}models/${encodeURIComponent(modelId)}/`;
         window.open(url, '_blank');
     }
 
     copyShareLink(modelId) {
-        const url = `${location.origin}/models/${encodeURIComponent(modelId)}/`;
+        const basePath = window.location.pathname.replace(/[^/]*$/, '');
+        const url = `${basePath}models/${encodeURIComponent(modelId)}/`;
         navigator.clipboard.writeText(url).then(() => alert('Share link copied to clipboard!')).catch(() => prompt('Copy this link:', url));
     }
 
@@ -1355,7 +1357,8 @@ class ModelShowcase {
     }
 
     openShareLink(modelId) {
-        const url = `${location.origin}/models/${encodeURIComponent(modelId)}/`;
+        const basePath = window.location.pathname.replace(/[^/]*$/, '');
+        const url = `${basePath}models/${encodeURIComponent(modelId)}/`;
         window.open(url, '_blank');
     }
 
