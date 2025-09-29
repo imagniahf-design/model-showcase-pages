@@ -920,6 +920,14 @@ class ModelShowcase {
         localStorage.setItem('models', JSON.stringify(this.models));
     }
 
+    savePublishing() {
+        try {
+            localStorage.setItem('publishing', JSON.stringify(this.publishing));
+        } catch (_) {
+            // ignore storage quota issues
+        }
+    }
+
     saveFolders() {
         localStorage.setItem('folders', JSON.stringify(this.folders));
         localStorage.setItem('currentFolder', this.currentFolder);
@@ -1034,6 +1042,48 @@ class ModelShowcase {
         model.pageContent = pageContent;
         model.pageGenerated = true;
         this.saveModels();
+    }
+
+    buildStandaloneModelPage({ name, description, glbUrl, usdzUrl, previewImage }) {
+        return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${name} - 3D Model</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+</head>
+<body>
+    <div style="background: #0f172a; color: white; font-family: Inter, sans-serif; min-height: 100vh;">
+        <header style="padding: 1rem; text-align: center; border-bottom: 1px solid #1e293b;">
+            <h1 style="margin: 0; font-size: 1.5rem;">🎯 ${name}</h1>
+            ${description ? `<p style="margin: 0.5rem 0 0 0; color: #94a3b8;">${description}</p>` : ''}
+        </header>
+        <main style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
+            <div style="background: #1e293b; border-radius: 1rem; padding: 1rem; margin-bottom: 2rem;">
+                <model-viewer 
+                    src="${glbUrl}" 
+                    ios-src="${usdzUrl}"
+                    alt="${name}"
+                    ar 
+                    ar-modes="scene-viewer quick-look webxr" 
+                    camera-controls 
+                    auto-rotate 
+                    environment-image="neutral" 
+                    poster="${previewImage}"
+                    ar-placement="floor"
+                    ar-scale="auto"
+                    style="width: 100%; height: 500px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+                    <button slot="ar-button" style="position:absolute; bottom:16px; left:50%; transform:translateX(-50%); padding:12px 24px; font-size:16px; font-weight:bold; background:#000; color:#fff; border:none; border-radius:8px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.2);">START AR</button>
+                </model-viewer>
+            </div>
+        </main>
+    </div>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+</body>
+</html>`;
     }
 
     deleteFolder(folderId) {
