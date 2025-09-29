@@ -101,6 +101,10 @@ class ModelShowcase {
         const keepLocalToggle = document.getElementById('cf-keep-local');
         const publishOnUploadToggle = document.getElementById('cf-publish-on-upload');
         const addSampleBtn = document.getElementById('add-sample-model');
+        // GitHub inputs
+        const githubToken = document.getElementById('github-token');
+        const githubUsername = document.getElementById('github-username');
+        const githubRepo = document.getElementById('github-repo');
 
         if (cfAccessKey && cfSecretKey && cfAccountId && cfPublicUrl) {
             cfAccessKey.value = this.publishing.accessKey || '';
@@ -109,10 +113,14 @@ class ModelShowcase {
             cfPublicUrl.value = this.publishing.publicUrl || '';
             if (keepLocalToggle) keepLocalToggle.checked = this.publishing.keepLocal !== false;
             if (publishOnUploadToggle) publishOnUploadToggle.checked = this.publishing.publishOnUpload === true;
+            // Prefill GitHub inputs from saved publishing
+            if (githubToken) githubToken.value = this.publishing.githubToken || '';
+            if (githubUsername) githubUsername.value = this.publishing.githubUsername || 'imagniahf-design';
+            if (githubRepo) githubRepo.value = this.publishing.githubRepo || 'model-showcase-pages';
 
             savePublishing?.addEventListener('click', () => {
                 this.publishing = {
-                    storageType: this.publishing.storageType || 'github',
+                    storageType: (document.getElementById('storage-type')?.value) || 'github',
                     githubToken: githubToken.value.trim(),
                     githubUsername: githubUsername.value.trim(),
                     githubRepo: githubRepo.value.trim(),
@@ -329,6 +337,9 @@ class ModelShowcase {
                     this.publishing.githubRepo = 'model-showcase-pages';
                 }
                 this.savePublishing();
+                // Reflect into inputs
+                if (githubUsername) githubUsername.value = this.publishing.githubUsername;
+                if (githubRepo) githubRepo.value = this.publishing.githubRepo;
             }
         }
     }
@@ -1154,12 +1165,12 @@ class ModelShowcase {
     }
 
     viewModel(modelId) {
-        const url = `${location.origin}/model/${encodeURIComponent(modelId)}`;
+        const url = `${location.origin}/model.html?id=${encodeURIComponent(modelId)}`;
         window.open(url, '_blank');
     }
 
     copyShareLink(modelId) {
-        const url = `${location.origin}/model/${encodeURIComponent(modelId)}`;
+        const url = `${location.origin}/model.html?id=${encodeURIComponent(modelId)}`;
         navigator.clipboard.writeText(url).then(() => alert('Share link copied to clipboard!')).catch(() => prompt('Copy this link:', url));
     }
 
@@ -1206,7 +1217,7 @@ class ModelShowcase {
     }
 
     openShareLink(modelId) {
-        const url = `${location.origin}/model/${encodeURIComponent(modelId)}`;
+        const url = `${location.origin}/model.html?id=${encodeURIComponent(modelId)}`;
         window.open(url, '_blank');
     }
 
