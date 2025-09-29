@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Model Showcase - Admin</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+</head>
+<body>
+    <div id="login-screen" class="login-container">
+        <div class="login-box">
+            <h1>🎯 Model Showcase</h1>
+            <p>Enter your credentials to access the admin panel</p>
+            <form id="login-form">
+                <input type="password" id="password" placeholder="Enter admin password" required>
+                <button type="submit">🚀 Access Admin Panel</button>
+            </form>
+            <div id="error-message" class="error-message"></div>
+        </div>
+    </div>
+
+    <div id="admin-panel" class="admin-panel hidden">
+        <header class="header">
+            <h1>🎯 3D Model Showcase</h1>
+            <button id="logout-btn" class="logout-btn">🚪 Logout</button>
+        </header>
+
+        <main class="admin-content">
+            <section class="settings-section">
+                <details open>
+                    <summary>⚙️ Storage Settings (GitHub Pages + Cloudflare R2)</summary>
+                    <div style="margin-top: 16px;">
+                        <!-- Storage Type Selection -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; font-weight: 600; color: var(--secondary-text); margin-bottom: 8px;">📦 Storage Type</label>
+                            <select id="storage-type" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--secondary-bg); color: var(--primary-text); font-size: 0.9rem; width: 200px;">
+                                <option value="github">🐙 GitHub Pages (Recommended)</option>
+                                <option value="cloudflare">☁️ Cloudflare R2</option>
+                                <option value="local">💾 Local Storage Only</option>
+                            </select>
+                        </div>
+
+                        <!-- GitHub Settings -->
+                        <div id="github-settings" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+                            <div style="grid-column: span 1;">
+                                <label>🔑 GitHub Token</label>
+                                <input id="github-token" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+                            </div>
+                            <div style="grid-column: span 1;">
+                                <label>👤 GitHub Username</label>
+                                <input id="github-username" type="text" value="imagniahf-design" placeholder="your-username">
+                            </div>
+                            <div style="grid-column: span 2;">
+                                <label>📁 Repository Name</label>
+                                <input id="github-repo" type="text" placeholder="model-showcase-pages" value="model-showcase-pages">
+                                <!-- Updated repository name -->
+                            </div>
+                        </div>
+
+                        <!-- Cloudflare Settings -->
+                        <div id="cloudflare-settings" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+                            <div style="grid-column: span 1;">
+                                <label>🔑 Access Key ID</label>
+                                <input id="cf-access-key" type="text" value="5d73ffa0d1686a2d1ae6d342a9f1aea1" placeholder="5d73ffa0d1686a2d1ae6d342a9f1aea1">
+                            </div>
+                            <div style="grid-column: span 1;">
+                                <label>🔐 Secret Key</label>
+                                <input id="cf-secret-key" type="password" value="a3fcecaff178fe966f9c0a34ce7466709815f9fe641c00ca7185b977cf0aaca6" placeholder="a3fcecaff178fe966f9c0a34ce7466709815f9fe641c00ca7185b977cf0aaca6">
+                            </div>
+                            <div style="grid-column: span 1;">
+                                <label>🏢 Account ID</label>
+                                <input id="cf-account-id" type="text" value="3e1268bf3af1ebe8d31efa35cf6832e2" placeholder="3e1268bf3af1ebe8d31efa35cf6832e2">
+                            </div>
+                            <div style="grid-column: span 1;">
+                                <label>🌐 Public URL</label>
+                                <input id="cf-public-url" type="text" value="https://pub-80de14f69b6048d6b5ca9266a1aa6d1e.r2.dev" placeholder="https://pub-80de14f69b6048d6b5ca9266a1aa6d1e.r2.dev">
+                            </div>
+                        </div>
+                        <div style="grid-column: span 2;">
+                            <p><strong>🔧 Cloudflare R2 Configuration Required:</strong></p>
+                            <p>💾 Enter your Cloudflare R2 credentials below. These are stored locally in your browser only and used to publish model files to your Cloudflare R2 bucket for permanent cloud storage.</p>
+                            <p><strong>📋 Required Fields:</strong> Access Key ID, Secret Key, Account ID, and Public URL</p>
+                            <details style="margin-top: 12px;">
+                                <summary style="cursor: pointer; color: #3b82f6; font-weight: 600;">🔧 CORS Configuration Help</summary>
+                                <div style="margin-top: 8px; padding: 12px; background: #f8fafc; border-radius: 8px; font-size: 0.9rem;">
+                                    <p><strong>If you get "failed to fetch" errors, you need to configure CORS on your R2 bucket:</strong></p>
+                                    <ol style="margin: 8px 0; padding-left: 20px;">
+                                        <li>Go to Cloudflare Dashboard → R2 Object Storage</li>
+                                        <li>Select your bucket "model-showcase-storage"</li>
+                                        <li>Go to Settings → CORS policy</li>
+                                        <li>Add this CORS configuration:</li>
+                                    </ol>
+                                    <pre style="background: #1e293b; color: #e2e8f0; padding: 8px; border-radius: 4px; font-size: 0.8rem; overflow-x: auto;">
+[
+  {
+    "AllowedOrigins": ["*"],
+    "AllowedMethods": ["GET", "PUT", "POST", "DELETE"],
+    "AllowedHeaders": ["*"],
+    "MaxAgeSeconds": 3600
+  }
+]</pre>
+                                </div>
+                            </details>
+                        </div>
+                        <div style="grid-column: span 1; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                            <button id="save-publishing" class="upload-btn" type="button">💾 Save Settings</button>
+                            <button id="test-connection" class="view-btn" type="button">🔗 Test Connection</button>
+                            <button id="clear-publishing" class="delete-btn" type="button">🗑️ Clear</button>
+                            <label style="display:flex; align-items:center; gap:8px; margin-left:8px;">
+                                <input id="cf-keep-local" type="checkbox" checked>
+                                📱 Keep local copy (recommended)
+                            </label>
+                            <label style="display:flex; align-items:center; gap:8px;">
+                                <input id="cf-publish-on-upload" type="checkbox">
+                                ☁️ Publish to Cloudflare R2 on upload
+                            </label>
+                            <button id="add-sample-model" class="view-btn" type="button">🎯 Add Sample Model</button>
+                        </div>
+                        <div id="publishing-status" style="grid-column: span 2; color:#718096; font-size:0.9rem;"></div>
+                    </div>
+                </details>
+            </section>
+            <section class="upload-section">
+                <h2>🚀 Upload New Model</h2>
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-content">
+                        <div class="upload-icon">📁</div>
+                        <h3>Drag & Drop Files Here</h3>
+                        <p>Upload .glb and .usdz files for your 3D models</p>
+                        <input type="file" id="file-input" accept=".glb,.usdz" multiple hidden>
+                        <button class="upload-btn" onclick="document.getElementById('file-input').click()">🎯 Choose Files</button>
+                        <button class="view-btn" onclick="console.log('Test button clicked'); alert('Test button works!');" style="margin-left: 10px;">🔧 Test Upload</button>
+                    </div>
+                </div>
+                <div id="upload-progress" class="upload-progress hidden">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <p>Uploading files...</p>
+                </div>
+            </section>
+
+            <section class="models-section">
+                <h2>🎯 Your Models</h2>
+                
+                <!-- Enhanced Folder Management -->
+                <div class="folder-management" style="margin-bottom: 1.5rem;">
+                    <div style="display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <input id="new-folder-name" type="text" placeholder="New folder name" style="padding:8px 12px; border:1px solid var(--border-color); border-radius:6px; background:var(--secondary-bg); color:var(--primary-text); font-size:0.9rem; width:150px;">
+                            <button id="create-folder" class="view-btn" type="button">📁 Create Folder</button>
+                            <button id="create-model-page-folder" class="upload-btn" type="button">📄 Create Model Page Folder</button>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                            <button id="publish-all" class="upload-btn" type="button">🚀 Publish All Models</button>
+                            <button id="refresh-cloud" class="view-btn" type="button">🔄 Refresh Cloud</button>
+                            <button id="generate-pages" class="view-btn" type="button">📄 Generate Model Pages</button>
+                        </div>
+                    </div>
+                    <div id="folders-list" class="folders-list" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+                        <!-- Folders will be dynamically loaded here -->
+                    </div>
+                    <span id="models-hint" style="color:#718096; font-size:0.9rem;"></span>
+                </div>
+                
+                <div id="models-grid" class="models-grid">
+                    <!-- Models will be dynamically loaded here -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Edit Model Modal -->
+    <div id="edit-modal" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; z-index:1000;">
+        <div style="background:#fff; border-radius:16px; width:95%; max-width:560px; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.2);">
+            <h3 style="margin-bottom:12px; font-size:1.25rem; color:#2d3748;">Edit Model</h3>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div style="grid-column:span 1;">
+                    <label style="display:block; font-size:0.9rem; color:#4a5568; margin-bottom:6px;">Title</label>
+                    <input id="edit-title" type="text" placeholder="Model title" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;" />
+                </div>
+                <div style="grid-column:span 1;">
+                    <label style="display:block; font-size:0.9rem; color:#4a5568; margin-bottom:6px;">Description</label>
+                    <input id="edit-desc" type="text" placeholder="Short description" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;" />
+                </div>
+                <div style="grid-column:span 2;">
+                    <label style="display:block; font-size:0.9rem; color:#4a5568; margin-bottom:6px;">Preview Image</label>
+                    <input id="edit-preview" type="file" accept="image/*" style="display:block; width:100%;" />
+                </div>
+                <div>
+                    <label style="display:block; font-size:0.9rem; color:#4a5568; margin-bottom:6px;">Replace GLB</label>
+                    <input id="edit-glb" type="file" accept=".glb" style="display:block; width:100%;" />
+                </div>
+                <div>
+                    <label style="display:block; font-size:0.9rem; color:#4a5568; margin-bottom:6px;">Replace USDZ</label>
+                    <input id="edit-usdz" type="file" accept=".usdz" style="display:block; width:100%;" />
+                </div>
+                <div style="grid-column:span 2; display:flex; gap:10px; margin-top:12px;">
+                    <button id="edit-save" class="upload-btn" style="flex:1;">Save Changes</button>
+                    <button id="edit-cancel" class="delete-btn" style="flex:1;">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
