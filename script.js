@@ -1525,67 +1525,41 @@ class ModelPage {
     }
 
     renderModel(model) {
+        const usdz = model.usdzUrl ? `${model.usdzUrl}${model.usdzUrl.includes('?') ? '&' : '?'}filename=${encodeURIComponent(model.name || 'model')}.usdz&allowsContentScaling=1` : '';
+        const sceneViewer = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(model.glbUrl || '')}&mode=ar_only&title=${encodeURIComponent(model.name || 'Model')}#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
         document.body.innerHTML = `
             <div style="background: #0f172a; color: white; font-family: Inter, sans-serif; min-height: 100vh;">
                 <header style="padding: 1rem; text-align: center; border-bottom: 1px solid #1e293b;">
                     <h1 style="margin: 0; font-size: 1.5rem;">🎯 ${model.name}</h1>
-                    ${model.description ? `<p style="margin: 0.5rem 0 0 0; color: #94a3b8;">${model.description}</p>` : ''}
+                    ${model.description ? `<p style=\"margin: 0.5rem 0 0 0; color: #94a3b8;\">${model.description}</p>` : ''}
                 </header>
-                
                 <main style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
-                    <div style="background: #1e293b; border-radius: 1rem; padding: 1rem; margin-bottom: 2rem;">
-                        <model-viewer 
-                            src="${model.glbUrl}" 
-                            ios-src="${model.usdzUrl}"
-                            alt="${model.name}"
-                            ar 
-                            ar-modes="scene-viewer quick-look webxr" 
-                            camera-controls 
-                            auto-rotate 
-                            environment-image="neutral" 
-                            poster="${model.previewImage}"
-                            ar-placement="floor"
-                            ar-scale="auto"
-                            style="width: 100%; height: 500px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
-                            
-                            <button slot="ar-button" style="
-                                position: absolute;
-                                bottom: 16px;
-                                left: 50%;
-                                transform: translateX(-50%);
-                                padding: 12px 24px;
-                                font-size: 16px;
-                                font-weight: bold;
-                                background: #000;
-                                color: #fff;
-                                border: none;
-                                border-radius: 8px;
-                                cursor: pointer;
-                                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                            ">
-                                START AR
-                            </button>
-                        </model-viewer>
+                    <div style="background: #1e293b; border-radius: 1rem; padding: 1rem; margin-bottom: 1.25rem; text-align:center;">
+                        <img src="${model.previewImage}" alt="${model.name}" style="max-width:100%; height:auto; border-radius:12px;" />
                     </div>
-                    
-                    <div style="text-align: center;">
-                        <p style="color: #94a3b8; margin-bottom: 1rem;">Share this model with others</p>
-                        <button onclick="navigator.clipboard.writeText(window.location.href); alert('Link copied!');" style="
-                            padding: 0.75rem 1.5rem;
-                            background: #3b82f6;
-                            color: white;
-                            border: none;
-                            border-radius: 0.5rem;
-                            cursor: pointer;
-                            font-weight: 600;
-                        ">
-                            📋 Copy Share Link
-                        </button>
+                    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                        <a id="ios-ar" rel="ar" href="${usdz}" style="display:none; padding:0.75rem 1.25rem; background:#16a34a; color:#fff; border-radius:8px; text-decoration:none; font-weight:600;">📱 Start AR (iOS)</a>
+                        <a id="android-ar" href="${sceneViewer}" style="display:none; padding:0.75rem 1.25rem; background:#0ea5e9; color:#fff; border-radius:8px; text-decoration:none; font-weight:600;">🤖 Start AR (Android)</a>
+                        <a id="download-usdz" href="${model.usdzUrl || '#'}" download style="display:none; padding:0.75rem 1.25rem; background:#64748b; color:#fff; border-radius:8px; text-decoration:none; font-weight:600;">⬇️ Download USDZ</a>
+                    </div>
+                    <div style="text-align: center; margin-top:16px;">
+                        <p style="color: #94a3b8; margin-bottom: 1rem;">Share this model</p>
+                        <button onclick="navigator.clipboard.writeText(window.location.href); alert('Link copied!');" style="padding: 0.75rem 1.5rem; background: #3b82f6; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">📋 Copy Share Link</button>
                     </div>
                 </main>
             </div>
-            
-            <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+            <script>
+                (function(){
+                  const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+                  const isAndroid = /Android/i.test(navigator.userAgent);
+                  const iosBtn = document.getElementById('ios-ar');
+                  const andBtn = document.getElementById('android-ar');
+                  const dlBtn = document.getElementById('download-usdz');
+                  if (isiOS && iosBtn) iosBtn.style.display = 'inline-block';
+                  if (isAndroid && andBtn) andBtn.style.display = 'inline-block';
+                  if (isiOS && dlBtn && iosBtn && !iosBtn.href) dlBtn.style.display = 'inline-block';
+                })();
+            </script>
         `;
     }
 }
