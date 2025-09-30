@@ -130,8 +130,11 @@
                         <h3>Drag & Drop Files Here</h3>
                         <p>Upload .glb and .usdz files for your 3D models</p>
                         <input type="file" id="file-input" accept=".glb,.usdz" multiple hidden>
-                        <button class="upload-btn" onclick="document.getElementById('file-input').click()">🎯 Choose Files</button>
-                        <button class="view-btn" onclick="console.log('Test button clicked'); alert('Test button works!');" style="margin-left: 10px;">🔧 Test Upload</button>
+                        <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                            <button class="upload-btn" onclick="document.getElementById('file-input').click()">🎯 Choose Files</button>
+                            <button class="view-btn" onclick="console.log('Test button clicked'); alert('Test button works!');">🔧 Test Upload</button>
+                            <button class="upload-btn" onclick="showUsdzConverter()" style="background: linear-gradient(135deg, #8b5cf6, #a855f7);">🔄 Convert to USDZ</button>
+                        </div>
                     </div>
                 </div>
                 <div id="upload-progress" class="upload-progress hidden">

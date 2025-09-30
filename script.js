@@ -1105,6 +1105,14 @@ class ModelShowcase {
     }
 
     buildStandaloneModelPage({ name, description, glbUrl, usdzUrl, previewImage }) {
+        // Convert GitHub API URLs to raw content URLs for direct access
+        const rawGlbUrl = glbUrl.replace('api.github.com/repos/', 'raw.githubusercontent.com/').replace('/contents/', '/').replace('?ref=main', '');
+        const rawUsdzUrl = usdzUrl.replace('api.github.com/repos/', 'raw.githubusercontent.com/').replace('/contents/', '/').replace('?ref=main', '');
+        const rawPosterUrl = previewImage.replace('api.github.com/repos/', 'raw.githubusercontent.com/').replace('/contents/', '/').replace('?ref=main', '');
+        
+        // Add iOS-specific parameters to USDZ URL for better compatibility
+        const iosUsdzUrl = `${rawUsdzUrl}#allowsContentScaling=1&filename=${encodeURIComponent(name)}.usdz`;
+        
         return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1114,6 +1122,49 @@ class ModelShowcase {
     <link rel="stylesheet" href="../../styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+    <style>
+        .ar-button {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        .ios-ar-link {
+            display: none;
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            background: #007AFF;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            text-decoration: none;
+            z-index: 10;
+        }
+        @media (max-width: 768px) {
+            .ar-button, .ios-ar-link {
+                bottom: 8px;
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div style="background: #0f172a; color: white; font-family: Inter, sans-serif; min-height: 100vh;">
@@ -1122,26 +1173,76 @@ class ModelShowcase {
             ${description ? `<p style="margin: 0.5rem 0 0 0; color: #94a3b8;">${description}</p>` : ''}
         </header>
         <main style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
-            <div style="background: #1e293b; border-radius: 1rem; padding: 1rem; margin-bottom: 2rem;">
+            <div style="background: #1e293b; border-radius: 1rem; padding: 1rem; margin-bottom: 2rem; position: relative;">
                 <model-viewer 
-                    src="${glbUrl}" 
-                    ios-src="${usdzUrl}"
+                    src="${rawGlbUrl}" 
+                    ios-src="${iosUsdzUrl}"
                     alt="${name}"
                     ar 
                     ar-modes="scene-viewer quick-look webxr" 
                     camera-controls 
                     auto-rotate 
                     environment-image="neutral" 
-                    poster="${previewImage}"
+                    poster="${rawPosterUrl}"
                     ar-placement="floor"
                     ar-scale="auto"
                     style="width: 100%; height: 500px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
-                    <button slot="ar-button" style="position:absolute; bottom:16px; left:50%; transform:translateX(-50%); padding:12px 24px; font-size:16px; font-weight:bold; background:#000; color:#fff; border:none; border-radius:8px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.2);">START AR</button>
+                    <button slot="ar-button" class="ar-button">START AR</button>
                 </model-viewer>
+                
+                <!-- iOS Quick Look fallback link -->
+                <a href="${iosUsdzUrl}" rel="ar" class="ios-ar-link" id="ios-ar-link">
+                    📱 Start AR (iOS)
+                </a>
+            </div>
+            
+            <!-- Debug info (remove in production) -->
+            <div style="background: #1e293b; border-radius: 0.5rem; padding: 1rem; margin-top: 1rem; font-size: 0.8rem; color: #94a3b8;">
+                <details>
+                    <summary>🔧 Debug Info</summary>
+                    <p><strong>GLB URL:</strong> <a href="${rawGlbUrl}" target="_blank" style="color: #60a5fa;">${rawGlbUrl}</a></p>
+                    <p><strong>USDZ URL:</strong> <a href="${rawUsdzUrl}" target="_blank" style="color: #60a5fa;">${rawUsdzUrl}</a></p>
+                    <p><strong>iOS USDZ:</strong> <a href="${iosUsdzUrl}" target="_blank" style="color: #60a5fa;">${iosUsdzUrl}</a></p>
+                    <p><strong>Poster:</strong> <a href="${rawPosterUrl}" target="_blank" style="color: #60a5fa;">${rawPosterUrl}</a></p>
+                </details>
             </div>
         </main>
     </div>
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <script>
+        // iOS capability detection and AR button management
+        document.addEventListener('DOMContentLoaded', function() {
+            const modelViewer = document.querySelector('model-viewer');
+            const arButton = document.querySelector('.ar-button');
+            const iosArLink = document.querySelector('#ios-ar-link');
+            
+            // Check if device supports iOS Quick Look
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const supportsQuickLook = isIOS && 'ontouchstart' in window;
+            
+            if (supportsQuickLook) {
+                // Hide model-viewer AR button, show native iOS AR link
+                if (arButton) arButton.style.display = 'none';
+                if (iosArLink) iosArLink.style.display = 'block';
+            } else {
+                // Show model-viewer AR button, hide iOS link
+                if (arButton) arButton.style.display = 'block';
+                if (iosArLink) iosArLink.style.display = 'none';
+            }
+            
+            // Test USDZ accessibility
+            fetch('${rawUsdzUrl}', { method: 'HEAD' })
+                .then(response => {
+                    console.log('USDZ accessibility test:', response.status, response.headers.get('content-type'));
+                    if (response.status !== 200) {
+                        console.warn('USDZ file may not be accessible:', response.status);
+                    }
+                })
+                .catch(error => {
+                    console.error('USDZ accessibility test failed:', error);
+                });
+        });
+    </script>
 </body>
 </html>`;
     }
@@ -1169,6 +1270,127 @@ class ModelShowcase {
             this.renderFolders();
             this.loadModels();
         }
+    }
+
+    showUsdzConverter() {
+        const converterModal = document.createElement('div');
+        converterModal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        `;
+        
+        converterModal.innerHTML = `
+            <div style="
+                background: linear-gradient(135deg, #1e293b, #334155);
+                border: 1px solid #475569;
+                border-radius: 16px;
+                padding: 2rem;
+                max-width: 600px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 style="margin: 0; color: #f1f5f9; font-size: 1.5rem;">🔄 Convert GLB to USDZ</h2>
+                    <button onclick="this.closest('.converter-modal').remove()" style="
+                        background: none;
+                        border: none;
+                        color: #94a3b8;
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        padding: 0.5rem;
+                    ">✕</button>
+                </div>
+                
+                <div style="color: #cbd5e1; line-height: 1.6;">
+                    <p style="margin-bottom: 1rem;">To fix iOS AR issues, you need to convert your GLB file to USDZ format. Here are the best methods:</p>
+                    
+                    <div style="background: #0f172a; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                        <h3 style="color: #60a5fa; margin-top: 0;">🍎 Method 1: Apple Reality Converter (Recommended)</h3>
+                        <ol style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                            <li>Download <a href="https://developer.apple.com/augmented-reality/tools/" target="_blank" style="color: #60a5fa;">Reality Converter</a> (free from Apple)</li>
+                            <li>Open your GLB file in Reality Converter</li>
+                            <li>Export as USDZ with these settings:
+                                <ul style="margin: 0.5rem 0; padding-left: 1rem;">
+                                    <li>✅ Embed textures</li>
+                                    <li>✅ Use relative paths</li>
+                                    <li>✅ Optimize for AR</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div style="background: #0f172a; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                        <h3 style="color: #60a5fa; margin-top: 0;">🌐 Method 2: Online Converters</h3>
+                        <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                            <li><a href="https://products.aspose.app/3d/conversion/glb-to-usdz" target="_blank" style="color: #60a5fa;">Aspose 3D Converter</a></li>
+                            <li><a href="https://convertio.co/glb-usdz/" target="_blank" style="color: #60a5fa;">Convertio</a></li>
+                            <li><a href="https://www.anyconv.com/glb-to-usdz-converter/" target="_blank" style="color: #60a5fa;">AnyConv</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div style="background: #0f172a; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                        <h3 style="color: #60a5fa; margin-top: 0;">⚙️ Method 3: Command Line (Advanced)</h3>
+                        <pre style="background: #000; padding: 0.5rem; border-radius: 4px; font-size: 0.8rem; overflow-x: auto; margin: 0.5rem 0;">
+# Install usdz-converter (requires macOS)
+pip install usdz-converter
+usdz-converter input.glb output.usdz</pre>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #059669, #10b981); border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                        <h4 style="color: white; margin-top: 0;">💡 Pro Tips for iOS AR Success:</h4>
+                        <ul style="margin: 0.5rem 0; padding-left: 1.5rem; color: white;">
+                            <li>Keep file size under 200MB</li>
+                            <li>Use simple materials and textures</li>
+                            <li>Test with Apple's sample USDZ first</li>
+                            <li>Ensure textures are embedded, not external</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 1.5rem;">
+                    <button onclick="this.closest('.converter-modal').remove()" style="
+                        flex: 1;
+                        padding: 0.75rem;
+                        background: linear-gradient(135deg, #dc2626, #ef4444);
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-weight: 600;
+                    ">Close</button>
+                    <button onclick="window.open('https://developer.apple.com/augmented-reality/tools/', '_blank')" style="
+                        flex: 1;
+                        padding: 0.75rem;
+                        background: linear-gradient(135deg, #2563eb, #3b82f6);
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-weight: 600;
+                    ">Download Reality Converter</button>
+                </div>
+            </div>
+        `;
+        
+        converterModal.className = 'converter-modal';
+        document.body.appendChild(converterModal);
+        
+        // Close on background click
+        converterModal.addEventListener('click', (e) => {
+            if (e.target === converterModal) {
+                converterModal.remove();
+            }
+        });
     }
 
     setCurrentFolder(folderId) {
@@ -1568,3 +1790,10 @@ class ModelPage {
 if (window.location.pathname.includes('/model/') || window.location.search.includes('id=')) {
     new ModelPage();
 }
+
+// Make showUsdzConverter globally accessible
+window.showUsdzConverter = function() {
+    if (window.modelShowcase) {
+        window.modelShowcase.showUsdzConverter();
+    }
+};
