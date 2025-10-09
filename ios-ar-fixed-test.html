@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS AR Fixed Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            color: white;
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .test-section {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 600px;
+        }
+        .ar-button {
+            background: #16a34a;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            display: inline-block;
+        }
+        .ar-button:hover {
+            background: #15803d;
+        }
+        .success {
+            background: #059669;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .info {
+            background: #1e40af;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 iOS AR Fixed Test</h1>
+    <p>This test uses the new fixed AR implementation that should open AR directly without downloading.</p>
+    
+    <div class="test-section">
+        <h2>✅ Fixed Implementation</h2>
+        <p>This button now uses <code>window.location.href</code> to open AR directly:</p>
+        <button onclick="openInAR('https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759500308569_a1kzt5czw/model.usdz')" class="ar-button">
+            🥊 Test Boxing Glove AR (Fixed)
+        </button>
+        <div class="success">
+            <strong>Expected behavior:</strong> AR should open immediately without downloading the file first.
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔧 How It Works Now</h2>
+        <div class="info">
+            <h3>Before (Old Method):</h3>
+            <p>❌ Created an &lt;a&gt; tag with rel="ar" → iOS downloaded the file first</p>
+            
+            <h3>After (New Method):</h3>
+            <p>✅ Uses window.location.href → iOS opens AR directly</p>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📱 Test Instructions</h2>
+        <ol style="text-align: left; max-width: 500px; margin: 0 auto;">
+            <li>Open this page in <strong>Safari</strong> on your iPhone/iPad</li>
+            <li>Tap the "Test Boxing Glove AR" button above</li>
+            <li>AR should open immediately without downloading</li>
+            <li>If it still downloads, try refreshing the page and test again</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h2>🎯 Test Your Models</h2>
+        <p>Test the fixed implementation with your other models:</p>
+        <a href="index.html" class="ar-button" style="text-decoration: none; display: inline-block;">🏠 Go to Admin Panel</a>
+    </div>
+    
+    <script>
+        // This is the same function used in the main app
+        function openInAR(usdzUrl) {
+            console.log('Opening USDZ in AR:', usdzUrl);
+            
+            if (!usdzUrl || usdzUrl === '#') {
+                alert('No USDZ file available for AR viewing.');
+                return;
+            }
+            
+            const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            
+            if (isiOS) {
+                // Method 1: Try direct window.location (most reliable for AR)
+                try {
+                    window.location.href = usdzUrl;
+                } catch (error) {
+                    console.log('Direct method failed, trying AR link method');
+                    
+                    // Method 2: Create AR link as fallback
+                    const arLink = document.createElement('a');
+                    arLink.href = usdzUrl;
+                    arLink.rel = 'ar';
+                    arLink.style.display = 'none';
+                    document.body.appendChild(arLink);
+                    arLink.click();
+                    document.body.removeChild(arLink);
+                }
+            } else {
+                alert('AR viewing is only available on iOS devices. Please open this page on an iPhone or iPad.');
+            }
+        }
+    </script>
+</body>
+</html>
