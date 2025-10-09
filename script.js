@@ -1051,10 +1051,12 @@ class ModelShowcase {
                     ar-modes="scene-viewer quick-look webxr" 
                     camera-controls 
                     auto-rotate 
+                    autoplay
                     environment-image="neutral" 
                     poster="${model.previewImage}"
                     ar-placement="floor"
                     ar-scale="auto"
+                    interaction-policy="allow-when-focused"
                     style="width: 100%; height: 500px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
                     
                     <button slot="ar-button" style="
@@ -1182,10 +1184,12 @@ class ModelShowcase {
                     ar-modes="scene-viewer quick-look webxr" 
                     camera-controls 
                     auto-rotate 
+                    autoplay
                     environment-image="neutral" 
                     poster="${rawPosterUrl}"
                     ar-placement="floor"
                     ar-scale="auto"
+                    interaction-policy="allow-when-focused"
                     style="width: 100%; height: 500px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
                     <button slot="ar-button" class="ar-button">START AR</button>
                 </model-viewer>
@@ -1707,9 +1711,15 @@ class ModelPage {
         const glbUrl = manifest.glbFile || manifest.glb;
         let usdzUrl = manifest.usdzFile || manifest.usdz;
         
+        // Ensure USDZ URL is a direct link (not GitHub API URL)
+        if (usdzUrl && usdzUrl.includes('api.github.com')) {
+            usdzUrl = usdzUrl.replace('api.github.com/repos/', 'raw.githubusercontent.com/').replace('/contents/', '/').replace('?ref=main', '');
+        }
+        
         // Add filename and allowsContentScaling parameters for iOS AR
         if (usdzUrl && !usdzUrl.includes('filename=')) {
-            usdzUrl += `${usdzUrl.includes('?') ? '&' : '?'}filename=model.usdz&allowsContentScaling=1`;
+            const modelName = (manifest.name || manifest.title || 'model').replace(/[^a-zA-Z0-9]/g, '_');
+            usdzUrl += `${usdzUrl.includes('?') ? '&' : '?'}filename=${modelName}.usdz&allowsContentScaling=1`;
         }
 
         return {
@@ -1747,8 +1757,22 @@ class ModelPage {
     }
 
     renderModel(model) {
-        const usdz = model.usdzUrl ? `${model.usdzUrl}${model.usdzUrl.includes('?') ? '&' : '?'}filename=${encodeURIComponent(model.name || 'model')}.usdz&allowsContentScaling=1` : '';
+        // Ensure USDZ URL is properly formatted for iOS AR
+        let usdz = model.usdzUrl;
+        if (usdz) {
+            // Ensure it's a direct link, not GitHub API URL
+            if (usdz.includes('api.github.com')) {
+                usdz = usdz.replace('api.github.com/repos/', 'raw.githubusercontent.com/').replace('/contents/', '/').replace('?ref=main', '');
+            }
+            // Add iOS AR parameters if not already present
+            if (!usdz.includes('filename=')) {
+                const modelName = (model.name || 'model').replace(/[^a-zA-Z0-9]/g, '_');
+                usdz += `${usdz.includes('?') ? '&' : '?'}filename=${modelName}.usdz&allowsContentScaling=1`;
+            }
+        }
+        
         const sceneViewer = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(model.glbUrl || '')}&mode=ar_only&title=${encodeURIComponent(model.name || 'Model')}#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
+        
         document.body.innerHTML = `
             <div style="background: #0f172a; color: white; font-family: Inter, sans-serif; min-height: 100vh;">
                 <header style="padding: 1rem; text-align: center; border-bottom: 1px solid #1e293b;">
@@ -1760,9 +1784,9 @@ class ModelPage {
                         <img src="${model.previewImage}" alt="${model.name}" style="max-width:100%; height:auto; border-radius:12px;" />
                     </div>
                     <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-                        <a id="ios-ar" rel="ar" href="${usdz}" style="display:none; padding:0.75rem 1.25rem; background:#16a34a; color:#fff; border-radius:8px; text-decoration:none; font-weight:600;">📱 Start AR (iOS)</a>
+                        <a id="ios-ar" rel="ar" href="${usdz || '#'}" style="display:none; padding:0.75rem 1.25rem; background:#16a34a; color:#fff; border-radius:8px; text-decoration:none; font-weight:600;">📱 Start AR (iOS)</a>
                         <a id="android-ar" href="${sceneViewer}" style="display:none; padding:0.75rem 1.25rem; background:#0ea5e9; color:#fff; border-radius:8px; text-decoration:none; font-weight:600;">🤖 Start AR (Android)</a>
-                        <a id="download-usdz" href="${model.usdzUrl || '#'}" download style="display:none; padding:0.75rem 1.25rem; background:#64748b; color:#fff; border-radius:8px; text-decoration:none; font-weight:600;">⬇️ Download USDZ</a>
+                        <a id="download-usdz" href="${usdz || '#'}" download style="display:none; padding:0.75rem 1.25rem; background:#64748b; color:#fff; border-radius:8px; text-decoration:none; font-weight:600;">⬇️ Download USDZ</a>
                     </div>
                     <div style="text-align: center; margin-top:16px;">
                         <p style="color: #94a3b8; margin-bottom: 1rem;">Share this model</p>
@@ -1777,9 +1801,28 @@ class ModelPage {
                   const iosBtn = document.getElementById('ios-ar');
                   const andBtn = document.getElementById('android-ar');
                   const dlBtn = document.getElementById('download-usdz');
-                  if (isiOS && iosBtn) iosBtn.style.display = 'inline-block';
+                  
+                  if (isiOS) {
+                    if (iosBtn && usdz) iosBtn.style.display = 'inline-block';
+                    if (dlBtn && usdz) dlBtn.style.display = 'inline-block';
+                  }
                   if (isAndroid && andBtn) andBtn.style.display = 'inline-block';
-                  if (isiOS && dlBtn && iosBtn && !iosBtn.href) dlBtn.style.display = 'inline-block';
+                  
+                  // Debug info for iOS AR
+                  if (isiOS && usdz) {
+                    console.log('iOS AR URL:', usdz);
+                    // Test if USDZ loads correctly
+                    fetch(usdz, { method: 'HEAD' })
+                      .then(response => {
+                        console.log('USDZ response:', response.status, response.headers.get('content-type'));
+                        if (response.status !== 200) {
+                          console.warn('USDZ file may not be accessible');
+                        }
+                      })
+                      .catch(error => {
+                        console.error('USDZ test failed:', error);
+                      });
+                  }
                 })();
             </script>
         `;

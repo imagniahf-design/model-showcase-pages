@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS AR Test - 3D Model Showcase</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+</head>
+<body>
+    <div style="padding: 2rem; text-align: center; background: #0f172a; color: white; min-height: 100vh; font-family: Inter, sans-serif;">
+        <h1>🎯 iOS AR Test Page</h1>
+        <p>This page helps debug iOS AR issues with your 3D models.</p>
+        
+        <div style="background: #1e293b; padding: 2rem; border-radius: 1rem; margin: 2rem 0; max-width: 800px; margin-left: auto; margin-right: auto;">
+            <h2>Test Model Viewer</h2>
+            <p>If you have a model uploaded, it will appear below:</p>
+            
+            <!-- Test model viewer with proper iOS AR configuration -->
+            <model-viewer 
+                id="test-model-viewer"
+                src="https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1759500509903_e0e0pjwpa/model.glb"
+                ios-src="https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1759500509903_e0e0pjwpa/model.usdz?filename=test_model.usdz&allowsContentScaling=1"
+                alt="Test 3D Model"
+                ar 
+                ar-modes="scene-viewer quick-look webxr" 
+                camera-controls 
+                auto-rotate 
+                autoplay
+                environment-image="neutral" 
+                ar-placement="floor"
+                ar-scale="auto"
+                interaction-policy="allow-when-focused"
+                style="width: 100%; height: 400px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); background: #f6fafe;">
+                
+                <button slot="ar-button" style="
+                    position: absolute;
+                    bottom: 16px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    padding: 12px 24px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    background: #000;
+                    color: #fff;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                ">
+                    START AR
+                </button>
+            </model-viewer>
+        </div>
+        
+        <div style="background: #1e293b; padding: 1.5rem; border-radius: 1rem; margin: 2rem 0; max-width: 800px; margin-left: auto; margin-right: auto;">
+            <h3>🔧 Debug Information</h3>
+            <div id="debug-info" style="text-align: left; font-family: monospace; font-size: 0.9rem; color: #94a3b8;">
+                <p><strong>User Agent:</strong> <span id="user-agent"></span></p>
+                <p><strong>Is iOS:</strong> <span id="is-ios"></span></p>
+                <p><strong>Is Android:</strong> <span id="is-android"></span></p>
+                <p><strong>Model Viewer Support:</strong> <span id="model-viewer-support"></span></p>
+                <p><strong>AR Support:</strong> <span id="ar-support"></span></p>
+            </div>
+        </div>
+        
+        <div style="background: #1e293b; padding: 1.5rem; border-radius: 1rem; margin: 2rem 0; max-width: 800px; margin-left: auto; margin-right: auto;">
+            <h3>📱 Direct iOS AR Links</h3>
+            <p>Test these direct links on your iOS device:</p>
+            <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                <a href="https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1759500509903_e0e0pjwpa/model.usdz?filename=test_model.usdz&allowsContentScaling=1" 
+                   rel="ar" 
+                   style="padding: 1rem; background: #16a34a; color: white; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                    📱 Test USDZ Direct Link (iOS)
+                </a>
+                <a href="https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1759500308569_a1kzt5czw/model.usdz?filename=boxing_glove.usdz&allowsContentScaling=1" 
+                   rel="ar" 
+                   style="padding: 1rem; background: #16a34a; color: white; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                    📱 Test Boxing Glove USDZ (iOS)
+                </a>
+            </div>
+        </div>
+        
+        <div style="background: #1e293b; padding: 1.5rem; border-radius: 1rem; margin: 2rem 0; max-width: 800px; margin-left: auto; margin-right: auto;">
+            <h3>✅ iOS AR Checklist</h3>
+            <ul style="text-align: left; color: #94a3b8;">
+                <li>✓ USDZ files have correct MIME type (model/vnd.usdz+zip)</li>
+                <li>✓ Direct URLs (not GitHub API URLs)</li>
+                <li>✓ Filename parameter added for iOS</li>
+                <li>✓ allowsContentScaling=1 parameter added</li>
+                <li>✓ rel="ar" attribute on iOS AR links</li>
+                <li>✓ Model-viewer configured with proper AR modes</li>
+            </ul>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <a href="index.html" style="color: #3b82f6; text-decoration: none; font-weight: 600;">← Back to Admin Panel</a>
+        </div>
+    </div>
+    
+    <script>
+        // Debug information
+        document.getElementById('user-agent').textContent = navigator.userAgent;
+        document.getElementById('is-ios').textContent = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'Yes' : 'No';
+        document.getElementById('is-android').textContent = /Android/i.test(navigator.userAgent) ? 'Yes' : 'No';
+        document.getElementById('model-viewer-support').textContent = 'model-viewer' in document.createElement('model-viewer') ? 'Supported' : 'Not Supported';
+        document.getElementById('ar-support').textContent = 'xr' in navigator ? 'Supported' : 'Not Supported';
+        
+        // Test USDZ accessibility
+        const testUsdzUrl = 'https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1759500509903_e0e0pjwpa/model.usdz';
+        
+        fetch(testUsdzUrl, { method: 'HEAD' })
+            .then(response => {
+                console.log('USDZ Test Response:', {
+                    status: response.status,
+                    contentType: response.headers.get('content-type'),
+                    contentLength: response.headers.get('content-length')
+                });
+                
+                const debugInfo = document.getElementById('debug-info');
+                debugInfo.innerHTML += `
+                    <p><strong>USDZ Test Status:</strong> ${response.status}</p>
+                    <p><strong>Content-Type:</strong> ${response.headers.get('content-type')}</p>
+                    <p><strong>Content-Length:</strong> ${response.headers.get('content-length')} bytes</p>
+                `;
+            })
+            .catch(error => {
+                console.error('USDZ Test Failed:', error);
+                const debugInfo = document.getElementById('debug-info');
+                debugInfo.innerHTML += `<p><strong>USDZ Test Error:</strong> ${error.message}</p>`;
+            });
+    </script>
+</body>
+</html>
