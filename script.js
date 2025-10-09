@@ -1194,10 +1194,10 @@ class ModelShowcase {
                     <button slot="ar-button" class="ar-button">START AR</button>
                 </model-viewer>
                 
-                <!-- iOS Quick Look fallback link -->
-                <a href="${iosUsdzUrl}" rel="ar" class="ios-ar-link" id="ios-ar-link">
+                <!-- iOS Quick Look fallback button -->
+                <button onclick="openInAR('${iosUsdzUrl}')" class="ios-ar-link" id="ios-ar-link">
                     📱 Start AR (iOS)
-                </a>
+                </button>
             </div>
             
             <!-- Debug info (remove in production) -->
@@ -1789,7 +1789,6 @@ class ModelPage {
                     <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
                         <button id="ios-ar" onclick="openInAR('${usdz || ''}')" style="display:none; padding:0.75rem 1.25rem; background:#16a34a; color:#fff; border-radius:8px; border:none; font-weight:600; cursor:pointer;">📱 Start AR (iOS)</button>
                         <a id="android-ar" href="${sceneViewer}" style="display:none; padding:0.75rem 1.25rem; background:#0ea5e9; color:#fff; border-radius:8px; text-decoration:none; font-weight:600;">🤖 Start AR (Android)</a>
-                        <a id="download-usdz" href="${usdz || '#'}" download style="display:none; padding:0.75rem 1.25rem; background:#64748b; color:#fff; border-radius:8px; text-decoration:none; font-weight:600;">⬇️ Download USDZ</a>
                     </div>
                     <div style="text-align: center; margin-top:16px;">
                         <p style="color: #94a3b8; margin-bottom: 1rem;">Share this model</p>
@@ -1810,15 +1809,21 @@ class ModelPage {
                     const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
                     
                     if (isiOS) {
-                        // For iOS, create a proper AR link
-                        const arLink = document.createElement('a');
-                        arLink.href = usdzUrl;
-                        arLink.rel = 'ar';
-                        arLink.target = '_blank';
-                        arLink.style.display = 'none';
-                        document.body.appendChild(arLink);
-                        arLink.click();
-                        document.body.removeChild(arLink);
+                        // Method 1: Try direct window.location (most reliable for AR)
+                        try {
+                            window.location.href = usdzUrl;
+                        } catch (error) {
+                            console.log('Direct method failed, trying AR link method');
+                            
+                            // Method 2: Create AR link as fallback
+                            const arLink = document.createElement('a');
+                            arLink.href = usdzUrl;
+                            arLink.rel = 'ar';
+                            arLink.style.display = 'none';
+                            document.body.appendChild(arLink);
+                            arLink.click();
+                            document.body.removeChild(arLink);
+                        }
                     } else {
                         alert('AR viewing is only available on iOS devices. Please open this page on an iPhone or iPad.');
                     }
@@ -1829,11 +1834,9 @@ class ModelPage {
                   const isAndroid = /Android/i.test(navigator.userAgent);
                   const iosBtn = document.getElementById('ios-ar');
                   const andBtn = document.getElementById('android-ar');
-                  const dlBtn = document.getElementById('download-usdz');
                   
                   if (isiOS) {
                     if (iosBtn && usdz) iosBtn.style.display = 'inline-block';
-                    if (dlBtn && usdz) dlBtn.style.display = 'inline-block';
                   }
                   if (isAndroid && andBtn) andBtn.style.display = 'inline-block';
                   
