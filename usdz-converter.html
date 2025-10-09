@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USDZ Converter & Fixer</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #3b82f6;
+        }
+        .section {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: background 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .button:hover {
+            background: #2563eb;
+        }
+        .button.secondary {
+            background: #6b7280;
+        }
+        .button.secondary:hover {
+            background: #4b5563;
+        }
+        .file-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #475569;
+            border-radius: 8px;
+            background: #334155;
+            color: white;
+            margin: 10px 0;
+        }
+        .info {
+            background: #1e40af;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .warning {
+            background: #dc2626;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #059669;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .step {
+            background: #374151;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #3b82f6;
+        }
+        .code {
+            background: #000;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 USDZ Converter & Fixer</h1>
+        <p>This tool helps you convert and fix USDZ files for iOS AR compatibility.</p>
+        
+        <div class="section">
+            <h2>🎯 Quick Test</h2>
+            <p>First, test if the issue is with your USDZ file or iOS AR setup:</p>
+            <a href="ios-ar-simple-test.html" class="button">📱 Test iOS AR</a>
+            <a href="https://developer.apple.com/augmented-reality/quick-look/models/teapot.usdz" rel="ar" class="button">🍵 Apple Sample</a>
+        </div>
+        
+        <div class="section">
+            <h2>🔍 Common USDZ Issues</h2>
+            <div class="warning">
+                <h3>❌ "Object could not be opened"</h3>
+                <p>This usually means:</p>
+                <ul>
+                    <li>USDZ file is corrupted or invalid</li>
+                    <li>File was not properly converted from GLB</li>
+                    <li>Missing required iOS AR parameters</li>
+                    <li>File size too large (>200MB)</li>
+                </ul>
+            </div>
+            
+            <div class="info">
+                <h3>✅ Working USDZ Requirements</h3>
+                <ul>
+                    <li>File size under 200MB</li>
+                    <li>Properly embedded textures (not external)</li>
+                    <li>Valid USDZ format (not just renamed ZIP)</li>
+                    <li>Simple materials and geometry</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🛠️ How to Fix Your USDZ Files</h2>
+            
+            <div class="step">
+                <h3>Step 1: Use Apple's Reality Converter</h3>
+                <p>Download and use Apple's official tool:</p>
+                <a href="https://developer.apple.com/augmented-reality/tools/" target="_blank" class="button">Download Reality Converter</a>
+                <div class="code">
+                    1. Open your GLB file in Reality Converter<br>
+                    2. Export as USDZ with these settings:<br>
+                    - ✅ Embed textures<br>
+                    - ✅ Use relative paths<br>
+                    - ✅ Optimize for AR<br>
+                    - ✅ Keep file size under 200MB
+                </div>
+            </div>
+            
+            <div class="step">
+                <h3>Step 2: Online Converters</h3>
+                <p>Try these online converters:</p>
+                <a href="https://products.aspose.app/3d/conversion/glb-to-usdz" target="_blank" class="button">Aspose 3D Converter</a>
+                <a href="https://convertio.co/glb-usdz/" target="_blank" class="button">Convertio</a>
+                <a href="https://www.anyconv.com/glb-to-usdz-converter/" target="_blank" class="button">AnyConv</a>
+            </div>
+            
+            <div class="step">
+                <h3>Step 3: Command Line (Advanced)</h3>
+                <div class="code">
+# Install usdz-converter (requires macOS)
+pip install usdz-converter
+usdz-converter input.glb output.usdz
+
+# Or use Apple's command line tools
+xcrun usdz_converter input.glb output.usdz
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📱 Test Your Fixed USDZ</h2>
+            <p>Upload your fixed USDZ file to test it:</p>
+            <input type="file" id="usdz-file" accept=".usdz" class="file-input">
+            <button onclick="testUsdzFile()" class="button">Test USDZ File</button>
+            <div id="test-result"></div>
+        </div>
+        
+        <div class="section">
+            <h2>🚀 Deploy Fixed USDZ</h2>
+            <p>Once you have a working USDZ file:</p>
+            <ol>
+                <li>Replace the old USDZ file in your models folder</li>
+                <li>Make sure the filename is exactly "model.usdz"</li>
+                <li>Upload to your GitHub repository</li>
+                <li>Test the iOS AR functionality</li>
+            </ol>
+            <a href="index.html" class="button">Back to Admin Panel</a>
+        </div>
+        
+        <div class="section">
+            <h2>🔧 Alternative Solution</h2>
+            <p>If USDZ conversion continues to fail, you can:</p>
+            <ul>
+                <li>Use only GLB files (they work in model-viewer)</li>
+                <li>Provide a download link for the USDZ file</li>
+                <li>Use a different 3D model format</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        function testUsdzFile() {
+            const fileInput = document.getElementById('usdz-file');
+            const resultDiv = document.getElementById('test-result');
+            
+            if (!fileInput.files[0]) {
+                resultDiv.innerHTML = '<div class="warning">Please select a USDZ file first.</div>';
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const fileSize = file.size / (1024 * 1024); // MB
+            
+            resultDiv.innerHTML = `
+                <div class="info">
+                    <h3>File Analysis:</h3>
+                    <p><strong>Name:</strong> ${file.name}</p>
+                    <p><strong>Size:</strong> ${fileSize.toFixed(2)} MB</p>
+                    <p><strong>Type:</strong> ${file.type}</p>
+                    ${fileSize > 200 ? '<p class="warning">⚠️ File is too large (>200MB). Consider reducing the size.</p>' : '<p class="success">✅ File size is acceptable.</p>'}
+                </div>
+            `;
+            
+            // Create a test link
+            const url = URL.createObjectURL(file);
+            const testLink = document.createElement('a');
+            testLink.href = url;
+            testLink.rel = 'ar';
+            testLink.className = 'button';
+            testLink.textContent = '📱 Test on iOS Device';
+            testLink.style.display = 'block';
+            testLink.style.marginTop = '10px';
+            
+            resultDiv.appendChild(testLink);
+        }
+    </script>
+</body>
+</html>
