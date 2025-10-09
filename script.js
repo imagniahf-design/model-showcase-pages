@@ -1770,11 +1770,8 @@ class ModelPage {
             if (usdz.includes('raw.githubusercontent.com')) {
                 usdz = usdz.replace('raw.githubusercontent.com', 'cdn.jsdelivr.net/gh');
             }
-            // Add iOS AR parameters if not already present
-            if (!usdz.includes('filename=')) {
-                const modelName = (model.name || 'model').replace(/[^a-zA-Z0-9]/g, '_');
-                usdz += `${usdz.includes('?') ? '&' : '?'}filename=${modelName}.usdz&allowsContentScaling=1`;
-            }
+            // Don't add filename parameter for direct AR links - iOS handles this better without it
+            // Just ensure it's a clean URL
         }
         
         const sceneViewer = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(model.glbUrl || '')}&mode=ar_only&title=${encodeURIComponent(model.name || 'Model')}#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
@@ -1790,7 +1787,7 @@ class ModelPage {
                         <img src="${model.previewImage}" alt="${model.name}" style="max-width:100%; height:auto; border-radius:12px;" />
                     </div>
                     <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-                        <a id="ios-ar" rel="ar" href="${usdz || '#'}" style="display:none; padding:0.75rem 1.25rem; background:#16a34a; color:#fff; border-radius:8px; text-decoration:none; font-weight:600;">📱 Start AR (iOS)</a>
+                        <button id="ios-ar" onclick="openInAR('${usdz || ''}')" style="display:none; padding:0.75rem 1.25rem; background:#16a34a; color:#fff; border-radius:8px; border:none; font-weight:600; cursor:pointer;">📱 Start AR (iOS)</button>
                         <a id="android-ar" href="${sceneViewer}" style="display:none; padding:0.75rem 1.25rem; background:#0ea5e9; color:#fff; border-radius:8px; text-decoration:none; font-weight:600;">🤖 Start AR (Android)</a>
                         <a id="download-usdz" href="${usdz || '#'}" download style="display:none; padding:0.75rem 1.25rem; background:#64748b; color:#fff; border-radius:8px; text-decoration:none; font-weight:600;">⬇️ Download USDZ</a>
                     </div>
@@ -1801,6 +1798,32 @@ class ModelPage {
                 </main>
             </div>
             <script>
+                // Global function for iOS AR
+                function openInAR(usdzUrl) {
+                    console.log('Opening USDZ in AR:', usdzUrl);
+                    
+                    if (!usdzUrl || usdzUrl === '#') {
+                        alert('No USDZ file available for AR viewing.');
+                        return;
+                    }
+                    
+                    const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+                    
+                    if (isiOS) {
+                        // For iOS, create a proper AR link
+                        const arLink = document.createElement('a');
+                        arLink.href = usdzUrl;
+                        arLink.rel = 'ar';
+                        arLink.target = '_blank';
+                        arLink.style.display = 'none';
+                        document.body.appendChild(arLink);
+                        arLink.click();
+                        document.body.removeChild(arLink);
+                    } else {
+                        alert('AR viewing is only available on iOS devices. Please open this page on an iPhone or iPad.');
+                    }
+                }
+                
                 (function(){
                   const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
                   const isAndroid = /Android/i.test(navigator.userAgent);

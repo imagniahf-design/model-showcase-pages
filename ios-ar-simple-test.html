@@ -68,34 +68,35 @@
         <div class="test-section">
             <h3>Test 1: Apple's Sample USDZ</h3>
             <p>This is a known working USDZ file from Apple:</p>
-            <a href="https://developer.apple.com/augmented-reality/quick-look/models/teapot.usdz" 
-               rel="ar" 
-               class="button">
+            <button onclick="openInAR('https://developer.apple.com/augmented-reality/quick-look/models/teapot.usdz')" class="button">
                 📱 Test Apple's Teapot (iOS)
-            </a>
+            </button>
             <div id="test1-status" class="status warning">Click to test</div>
         </div>
         
         <div class="test-section">
             <h3>Test 2: Your Model (Fixed URL)</h3>
             <p>Your model with proper iOS AR parameters:</p>
-            <a href="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759500509903_e0e0pjwpa/model.usdz" 
-               rel="ar" 
-               class="button">
+            <button onclick="openInAR('https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759500509903_e0e0pjwpa/model.usdz')" class="button">
                 📱 Test Your Model (iOS)
-            </a>
+            </button>
             <div id="test2-status" class="status warning">Click to test</div>
         </div>
         
         <div class="test-section">
             <h3>Test 3: Alternative USDZ URL</h3>
             <p>Try this alternative URL format:</p>
-            <a href="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759500509903_e0e0pjwpa/model.usdz?filename=model.usdz" 
-               rel="ar" 
-               class="button">
+            <button onclick="openInAR('https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759500509903_e0e0pjwpa/model.usdz?filename=model.usdz')" class="button">
                 📱 Test Alternative URL (iOS)
-            </a>
+            </button>
             <div id="test3-status" class="status warning">Click to test</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 4: Direct Safari Link</h3>
+            <p>Open directly in Safari (copy and paste this URL):</p>
+            <div class="code" id="safari-url">https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759500509903_e0e0pjwpa/model.usdz</div>
+            <button onclick="copyToClipboard('safari-url')" class="button secondary">📋 Copy URL</button>
         </div>
         
         <div class="info">
@@ -138,6 +139,53 @@
         
         const arSupport = 'xr' in navigator;
         document.getElementById('ar-support').textContent = arSupport ? 'Supported' : 'Not Supported';
+        
+        // Function to open USDZ in AR
+        function openInAR(usdzUrl) {
+            console.log('Opening USDZ in AR:', usdzUrl);
+            
+            if (isIOS) {
+                // For iOS, create a proper AR link
+                const arLink = document.createElement('a');
+                arLink.href = usdzUrl;
+                arLink.rel = 'ar';
+                arLink.target = '_blank';
+                arLink.style.display = 'none';
+                document.body.appendChild(arLink);
+                arLink.click();
+                document.body.removeChild(arLink);
+                
+                // Update status
+                const statusEl = document.getElementById('test1-status');
+                statusEl.textContent = '🔄 Opening in AR...';
+                statusEl.className = 'status warning';
+            } else {
+                alert('This test is designed for iOS devices. Please open this page on an iPhone or iPad.');
+            }
+        }
+        
+        // Function to copy URL to clipboard
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('URL copied to clipboard!');
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    // Fallback
+                    element.select();
+                    document.execCommand('copy');
+                    alert('URL copied to clipboard!');
+                });
+            } else {
+                // Fallback for older browsers
+                element.select();
+                document.execCommand('copy');
+                alert('URL copied to clipboard!');
+            }
+        }
         
         // Test USDZ files
         const testUrls = [
