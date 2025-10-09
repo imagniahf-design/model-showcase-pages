@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USDZ Proxy - iOS AR Fix</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .status {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            background: #007AFF;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+        .button:hover {
+            background: #0056CC;
+        }
+        .info {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 USDZ Proxy for iOS AR</h1>
+        <p>This page helps fix iOS AR issues by providing proper MIME types for USDZ files.</p>
+        
+        <div class="status">
+            <h3>Current Status</h3>
+            <p id="status-text">Checking USDZ file...</p>
+        </div>
+        
+        <div class="info">
+            <h4>Why this is needed:</h4>
+            <ul>
+                <li>GitHub Pages serves USDZ files as "application/octet-stream"</li>
+                <li>iOS Safari requires "model/vnd.usdz+zip" MIME type for AR</li>
+                <li>This proxy provides the correct MIME type</li>
+            </ul>
+        </div>
+        
+        <div id="buttons" style="display: none;">
+            <a href="#" id="ar-link" class="button">📱 Open in AR (iOS)</a>
+            <a href="#" id="download-link" class="button">⬇️ Download USDZ</a>
+        </div>
+        
+        <div class="info">
+            <h4>Debug Info:</h4>
+            <p><strong>User Agent:</strong> <span id="user-agent"></span></p>
+            <p><strong>Is iOS:</strong> <span id="is-ios"></span></p>
+            <p><strong>Original URL:</strong> <span id="original-url"></span></p>
+            <p><strong>Proxy URL:</strong> <span id="proxy-url"></span></p>
+        </div>
+    </div>
+    
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const usdzUrl = urlParams.get('url');
+        const modelName = urlParams.get('name') || 'model';
+        
+        // Update debug info
+        document.getElementById('user-agent').textContent = navigator.userAgent;
+        document.getElementById('is-ios').textContent = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'Yes' : 'No';
+        document.getElementById('original-url').textContent = usdzUrl || 'Not provided';
+        
+        if (usdzUrl) {
+            // Create proxy URL with proper parameters
+            const proxyUrl = `${window.location.origin}${window.location.pathname}?url=${encodeURIComponent(usdzUrl)}&name=${encodeURIComponent(modelName)}&download=true`;
+            document.getElementById('proxy-url').textContent = proxyUrl;
+            
+            // Set up buttons
+            document.getElementById('ar-link').href = usdzUrl;
+            document.getElementById('download-link').href = proxyUrl;
+            document.getElementById('buttons').style.display = 'block';
+            
+            // Test the USDZ file
+            fetch(usdzUrl, { method: 'HEAD' })
+                .then(response => {
+                    const statusText = document.getElementById('status-text');
+                    if (response.ok) {
+                        statusText.innerHTML = `
+                            ✅ USDZ file accessible<br>
+                            <small>Status: ${response.status} | Content-Type: ${response.headers.get('content-type')}</small>
+                        `;
+                    } else {
+                        statusText.innerHTML = `❌ USDZ file not accessible (Status: ${response.status})`;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('status-text').innerHTML = `❌ Error: ${error.message}`;
+                });
+        } else {
+            document.getElementById('status-text').textContent = '❌ No USDZ URL provided';
+        }
+        
+        // Handle download parameter
+        if (urlParams.get('download') === 'true' && usdzUrl) {
+            // Force download with proper MIME type
+            const link = document.createElement('a');
+            link.href = usdzUrl;
+            link.download = `${modelName}.usdz`;
+            link.click();
+        }
+    </script>
+</body>
+</html>

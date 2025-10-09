@@ -1716,10 +1716,12 @@ class ModelPage {
             usdzUrl = usdzUrl.replace('api.github.com/repos/', 'raw.githubusercontent.com/').replace('/contents/', '/').replace('?ref=main', '');
         }
         
-        // Add filename and allowsContentScaling parameters for iOS AR
-        if (usdzUrl && !usdzUrl.includes('filename=')) {
+        // Use jsDelivr CDN which serves files with correct MIME types
+        if (usdzUrl && usdzUrl.includes('raw.githubusercontent.com')) {
+            usdzUrl = usdzUrl.replace('raw.githubusercontent.com', 'cdn.jsdelivr.net/gh');
+            // Add filename parameter for iOS AR
             const modelName = (manifest.name || manifest.title || 'model').replace(/[^a-zA-Z0-9]/g, '_');
-            usdzUrl += `${usdzUrl.includes('?') ? '&' : '?'}filename=${modelName}.usdz&allowsContentScaling=1`;
+            usdzUrl += `?filename=${modelName}.usdz&allowsContentScaling=1`;
         }
 
         return {
@@ -1763,6 +1765,10 @@ class ModelPage {
             // Ensure it's a direct link, not GitHub API URL
             if (usdz.includes('api.github.com')) {
                 usdz = usdz.replace('api.github.com/repos/', 'raw.githubusercontent.com/').replace('/contents/', '/').replace('?ref=main', '');
+            }
+            // Use jsDelivr CDN for better MIME type support
+            if (usdz.includes('raw.githubusercontent.com')) {
+                usdz = usdz.replace('raw.githubusercontent.com', 'cdn.jsdelivr.net/gh');
             }
             // Add iOS AR parameters if not already present
             if (!usdz.includes('filename=')) {
