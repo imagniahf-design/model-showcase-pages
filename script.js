@@ -1716,8 +1716,8 @@ class ModelPage {
             id: manifest.id,
             name: manifest.name || manifest.title,
             description: manifest.description,
-            glbUrl: glbUrl.startsWith('http') ? glbUrl : `https://raw.githubusercontent.com/${this.publishing.githubUsername || 'imagniahf-design'}/${this.publishing.githubRepo || 'model-showcase-pages'}/main/models/${manifest.id}/model.glb`,
-            usdzUrl: usdzUrl && usdzUrl.startsWith('http') ? usdzUrl : (usdzUrl ? `https://raw.githubusercontent.com/${this.publishing.githubUsername || 'imagniahf-design'}/${this.publishing.githubRepo || 'model-showcase-pages'}/main/models/${manifest.id}/model.usdz` : ''),
+            glbUrl: glbUrl.startsWith('http') ? glbUrl : `https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/${manifest.id}/model.glb`,
+            usdzUrl: usdzUrl && usdzUrl.startsWith('http') ? usdzUrl : (usdzUrl ? `https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/${manifest.id}/model.usdz` : ''),
             previewImage: manifest.previewImage || manifest.poster
         };
     }
