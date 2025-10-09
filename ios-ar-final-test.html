@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS AR Final Test - Complete Solution</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #3b82f6;
+        }
+        .section {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: background 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .button:hover {
+            background: #2563eb;
+        }
+        .button.success { background: #059669; }
+        .button.warning { background: #dc2626; }
+        .info {
+            background: #1e40af;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .warning {
+            background: #dc2626;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #059669;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .code {
+            background: #000;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+            word-break: break-all;
+        }
+        .url-box {
+            background: #374151;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 iOS AR Final Test - Complete Solution</h1>
+        <p>This page tests every possible method to get iOS AR working with your USDZ files.</p>
+        
+        <div class="section">
+            <h2>🔍 Step 1: Test Apple's Working USDZ</h2>
+            <p>First, let's verify iOS AR works with Apple's sample:</p>
+            <button onclick="testAppleUSDZ()" class="button success">🍵 Test Apple's Teapot</button>
+            <div id="apple-result" class="info">Click the button above to test</div>
+        </div>
+        
+        <div class="section">
+            <h2>🔧 Step 2: Test Your USDZ File</h2>
+            <p>Now let's test your USDZ file with different methods:</p>
+            
+            <div class="url-box">
+                <h3>Method 1: Direct Link (Copy & Paste in Safari)</h3>
+                <div class="code" id="direct-url">https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759500509903_e0e0pjwpa/model.usdz</div>
+                <button onclick="copyToClipboard('direct-url')" class="button">📋 Copy Direct URL</button>
+                <p><strong>Instructions:</strong> Copy this URL, open Safari, paste it in the address bar, and press Enter.</p>
+            </div>
+            
+            <div class="url-box">
+                <h3>Method 2: JavaScript AR Link</h3>
+                <button onclick="openInAR('https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759500509903_e0e0pjwpa/model.usdz')" class="button">📱 Open in AR (JS)</button>
+                <div id="js-result" class="info">Click the button above to test</div>
+            </div>
+            
+            <div class="url-box">
+                <h3>Method 3: HTML AR Link</h3>
+                <a href="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759500509903_e0e0pjwpa/model.usdz" rel="ar" class="button">📱 Open in AR (HTML)</a>
+                <p><strong>Instructions:</strong> Tap this link directly on iOS Safari.</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🛠️ Step 3: Alternative USDZ Files</h2>
+            <p>Let's try different USDZ files from your collection:</p>
+            
+            <div class="url-box">
+                <h3>Boxing Glove Model</h3>
+                <button onclick="openInAR('https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759500308569_a1kzt5czw/model.usdz')" class="button">🥊 Test Boxing Glove</button>
+                <div class="code">https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759500308569_a1kzt5czw/model.usdz</div>
+            </div>
+            
+            <div class="url-box">
+                <h3>Low Poly Model</h3>
+                <button onclick="openInAR('https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759499339991_07j8y5btu/model.usdz')" class="button">🎮 Test Low Poly</button>
+                <div class="code">https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759499339991_07j8y5btu/model.usdz</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔍 Step 4: Debug Information</h2>
+            <div id="debug-info" class="info">
+                <h3>Device Information:</h3>
+                <p><strong>User Agent:</strong> <span id="user-agent"></span></p>
+                <p><strong>Is iOS:</strong> <span id="is-ios"></span></p>
+                <p><strong>iOS Version:</strong> <span id="ios-version"></span></p>
+                <p><strong>Browser:</strong> <span id="browser"></span></p>
+                <p><strong>AR Support:</strong> <span id="ar-support"></span></p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🚨 Step 5: Troubleshooting</h2>
+            <div class="warning">
+                <h3>If AR still doesn't work:</h3>
+                <ol>
+                    <li><strong>Make sure you're using Safari</strong> - Chrome/Firefox don't support iOS AR</li>
+                    <li><strong>Check iOS version</strong> - You need iOS 12+ for AR Quick Look</li>
+                    <li><strong>Enable Camera permissions</strong> - Settings > Privacy & Security > Camera</li>
+                    <li><strong>Try the direct URL method</strong> - Copy and paste the URL in Safari</li>
+                    <li><strong>Check if the USDZ file is valid</strong> - Try downloading it first</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📱 Step 6: Manual Test</h2>
+            <p>If all else fails, try this manual test:</p>
+            <div class="code">
+1. Open Safari on your iPhone/iPad<br>
+2. Go to: https://developer.apple.com/augmented-reality/quick-look/models/teapot.usdz<br>
+3. If this works, the issue is with your USDZ files<br>
+4. If this doesn't work, the issue is with your iOS setup
+            </div>
+        </div>
+        
+        <div style="margin-top: 2rem; text-align: center;">
+            <a href="index.html" class="button">← Back to Admin Panel</a>
+        </div>
+    </div>
+    
+    <script>
+        // Debug information
+        const userAgent = navigator.userAgent;
+        document.getElementById('user-agent').textContent = userAgent;
+        
+        const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
+        document.getElementById('is-ios').textContent = isIOS ? 'Yes' : 'No';
+        
+        if (isIOS) {
+            const iosVersion = userAgent.match(/OS (\d+)_/);
+            document.getElementById('ios-version').textContent = iosVersion ? `iOS ${iosVersion[1]}` : 'Unknown';
+        } else {
+            document.getElementById('ios-version').textContent = 'Not iOS';
+        }
+        
+        // Detect browser
+        let browser = 'Unknown';
+        if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) {
+            browser = 'Safari';
+        } else if (userAgent.includes('Chrome')) {
+            browser = 'Chrome';
+        } else if (userAgent.includes('Firefox')) {
+            browser = 'Firefox';
+        }
+        document.getElementById('browser').textContent = browser;
+        
+        const arSupport = 'xr' in navigator;
+        document.getElementById('ar-support').textContent = arSupport ? 'Supported' : 'Not Supported';
+        
+        // Test Apple's USDZ
+        function testAppleUSDZ() {
+            const resultEl = document.getElementById('apple-result');
+            resultEl.innerHTML = '🔄 Testing Apple\'s USDZ...';
+            
+            const appleUrl = 'https://developer.apple.com/augmented-reality/quick-look/models/teapot.usdz';
+            
+            if (isIOS) {
+                // Create AR link
+                const arLink = document.createElement('a');
+                arLink.href = appleUrl;
+                arLink.rel = 'ar';
+                arLink.target = '_blank';
+                arLink.style.display = 'none';
+                document.body.appendChild(arLink);
+                arLink.click();
+                document.body.removeChild(arLink);
+                
+                resultEl.innerHTML = '✅ Apple\'s USDZ should open in AR. If it works, your iOS AR is functioning correctly.';
+            } else {
+                resultEl.innerHTML = '❌ This test requires an iOS device. Please open this page on an iPhone or iPad.';
+            }
+        }
+        
+        // Open USDZ in AR
+        function openInAR(usdzUrl) {
+            console.log('Opening USDZ in AR:', usdzUrl);
+            
+            if (!isIOS) {
+                alert('AR viewing is only available on iOS devices. Please open this page on an iPhone or iPad.');
+                return;
+            }
+            
+            if (!usdzUrl) {
+                alert('No USDZ URL provided.');
+                return;
+            }
+            
+            // Method 1: Try direct AR link
+            try {
+                const arLink = document.createElement('a');
+                arLink.href = usdzUrl;
+                arLink.rel = 'ar';
+                arLink.target = '_blank';
+                arLink.style.display = 'none';
+                document.body.appendChild(arLink);
+                arLink.click();
+                document.body.removeChild(arLink);
+                
+                // Update result
+                const resultEl = document.getElementById('js-result');
+                resultEl.innerHTML = '🔄 Attempting to open in AR... If it doesn\'t work, try the direct URL method above.';
+            } catch (error) {
+                console.error('AR link failed:', error);
+                alert('Failed to open AR link. Try the direct URL method instead.');
+            }
+        }
+        
+        // Copy to clipboard
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('URL copied to clipboard! Now paste it in Safari.');
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    // Fallback
+                    element.select();
+                    document.execCommand('copy');
+                    alert('URL copied to clipboard! Now paste it in Safari.');
+                });
+            } else {
+                // Fallback for older browsers
+                element.select();
+                document.execCommand('copy');
+                alert('URL copied to clipboard! Now paste it in Safari.');
+            }
+        }
+        
+        // Test USDZ file accessibility
+        const testUrl = 'https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759500509903_e0e0pjwpa/model.usdz';
+        
+        fetch(testUrl, { method: 'HEAD' })
+            .then(response => {
+                console.log('USDZ Test Response:', {
+                    status: response.status,
+                    contentType: response.headers.get('content-type'),
+                    contentLength: response.headers.get('content-length')
+                });
+            })
+            .catch(error => {
+                console.error('USDZ Test Failed:', error);
+            });
+    </script>
+</body>
+</html>

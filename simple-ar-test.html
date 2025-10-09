@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple AR Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            color: white;
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .ar-link {
+            display: inline-block;
+            background: #007AFF;
+            color: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px;
+        }
+        .ar-link:hover {
+            background: #0056CC;
+        }
+        .info {
+            background: #333;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Simple AR Test</h1>
+    <p>This is the most basic test possible for iOS AR.</p>
+    
+    <div class="info">
+        <h2>Test 1: Apple's Working USDZ</h2>
+        <p>This should definitely work on iOS:</p>
+        <a href="https://developer.apple.com/augmented-reality/quick-look/models/teapot.usdz" rel="ar" class="ar-link">
+            🍵 Open Apple's Teapot in AR
+        </a>
+    </div>
+    
+    <div class="info">
+        <h2>Test 2: Your Model</h2>
+        <p>This is your model - if it downloads instead of opening in AR, the issue is with the USDZ file:</p>
+        <a href="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759500509903_e0e0pjwpa/model.usdz" rel="ar" class="ar-link">
+            🎯 Open Your Model in AR
+        </a>
+    </div>
+    
+    <div class="info">
+        <h2>Test 3: Alternative Model</h2>
+        <p>Try this other model from your collection:</p>
+        <a href="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1759500308569_a1kzt5czw/model.usdz" rel="ar" class="ar-link">
+            🥊 Open Boxing Glove in AR
+        </a>
+    </div>
+    
+    <div class="info">
+        <h2>Instructions:</h2>
+        <ol style="text-align: left; max-width: 500px; margin: 0 auto;">
+            <li>Open this page in <strong>Safari</strong> on your iPhone/iPad</li>
+            <li>Tap the links above</li>
+            <li>If Apple's teapot works but yours don't, the issue is with your USDZ files</li>
+            <li>If none work, check your iOS version and camera permissions</li>
+        </ol>
+    </div>
+    
+    <p><a href="index.html" style="color: #007AFF;">← Back to Admin Panel</a></p>
+</body>
+</html>
