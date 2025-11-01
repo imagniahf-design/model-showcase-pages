@@ -663,6 +663,148 @@ class ModelShowcase {
         }
     }
 
+    async deleteFromGitHub(modelId) {
+        const { githubToken, githubUsername, githubRepo } = this.publishing;
+        
+        if (!githubToken || !githubUsername || !githubRepo) {
+            throw new Error('GitHub credentials not configured');
+        }
+
+        console.log('Deleting model from GitHub:', modelId);
+        
+        const filesToDelete = [
+            `models/${modelId}/model.glb`,
+            `models/${modelId}/model.usdz`,
+            `models/${modelId}/poster.jpg`,
+            `models/${modelId}/index.html`,
+            `models/${modelId}.json`
+        ];
+
+        const errors = [];
+        
+        // Delete each file
+        for (const filePath of filesToDelete) {
+            try {
+                await this.deleteFileFromGitHub(filePath);
+                console.log(`Deleted: ${filePath}`);
+            } catch (error) {
+                console.warn(`Failed to delete ${filePath}:`, error.message);
+                errors.push(`${filePath}: ${error.message}`);
+            }
+        }
+
+        // Update the index to remove this model
+        try {
+            await this.removeFromGitHubIndex(modelId);
+        } catch (error) {
+            console.warn('Failed to update index:', error.message);
+            errors.push(`index.json: ${error.message}`);
+        }
+
+        if (errors.length > 0 && errors.length === filesToDelete.length + 1) {
+            throw new Error('Failed to delete any files: ' + errors.join(', '));
+        } else if (errors.length > 0) {
+            console.warn('Some files could not be deleted:', errors);
+        }
+        
+        console.log('Model deleted from GitHub successfully');
+    }
+
+    async deleteFileFromGitHub(filePath) {
+        const { githubToken, githubUsername, githubRepo } = this.publishing;
+        const apiUrl = `https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/${filePath}`;
+
+        // First, get the file SHA (required for deletion)
+        const getResponse = await fetch(apiUrl, {
+            headers: {
+                'Authorization': `token ${githubToken}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+
+        if (!getResponse.ok) {
+            if (getResponse.status === 404) {
+                // File doesn't exist, skip it
+                return;
+            }
+            throw new Error(`Failed to get file info: ${getResponse.status}`);
+        }
+
+        const fileData = await getResponse.json();
+        
+        // Delete the file
+        const deleteResponse = await fetch(apiUrl, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `token ${githubToken}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: `Delete ${filePath}`,
+                sha: fileData.sha
+            })
+        });
+
+        if (!deleteResponse.ok) {
+            const error = await deleteResponse.text();
+            throw new Error(`Failed to delete file: ${deleteResponse.status} - ${error}`);
+        }
+    }
+
+    async removeFromGitHubIndex(modelId) {
+        const { githubToken, githubUsername, githubRepo } = this.publishing;
+        
+        // Get existing index
+        let index = [];
+        let indexSha = null;
+        
+        try {
+            const indexResponse = await fetch(`https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/models/index.json`, {
+                headers: { 'Authorization': `token ${githubToken}` }
+            });
+            
+            if (indexResponse.ok) {
+                const indexData = await indexResponse.json();
+                index = JSON.parse(atob(indexData.content));
+                indexSha = indexData.sha;
+            }
+        } catch (e) {
+            // Index doesn't exist, nothing to update
+            return;
+        }
+
+        // Remove model ID from index
+        const originalLength = index.length;
+        index = index.filter(id => id !== modelId);
+        
+        if (index.length === originalLength) {
+            // Model wasn't in index, nothing to update
+            return;
+        }
+        
+        // Upload updated index
+        const base64Content = btoa(unescape(encodeURIComponent(JSON.stringify(index, null, 2))));
+        
+        const response = await fetch(`https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/models/index.json`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${githubToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: `Remove ${modelId} from index`,
+                content: base64Content,
+                sha: indexSha
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`Failed to update index: ${response.status} - ${error}`);
+        }
+    }
+
     async publishToCloudflare(model) {
         const { accessKey, secretKey, accountId, publicUrl } = this.publishing;
         if (!accessKey || !secretKey || !accountId || !publicUrl) {
@@ -938,6 +1080,76 @@ class ModelShowcase {
                 publicUrl
             );
         }
+    }
+
+    async deleteFromCloudflare(modelId) {
+        const { accessKey, secretKey, accountId, publicUrl } = this.publishing;
+        
+        if (!accessKey || !secretKey || !accountId || !publicUrl) {
+            throw new Error('Cloudflare R2 credentials not configured');
+        }
+
+        console.log('Deleting model from Cloudflare R2:', modelId);
+        
+        const filesToDelete = [
+            `models/${modelId}/model.glb`,
+            `models/${modelId}/model.usdz`,
+            `models/${modelId}/poster.jpg`,
+            `models/${modelId}.json`
+        ];
+
+        const errors = [];
+        
+        // Note: Cloudflare R2 deletion via S3 API requires signed requests
+        // For simplicity, we'll note that files exist but may need manual cleanup
+        // or implementation of proper S3 API signing
+        
+        console.warn('Cloudflare R2 deletion requires S3 API implementation.');
+        console.warn('Files to delete:', filesToDelete);
+        
+        // For now, just remove from index
+        try {
+            await this.removeFromCloudflareIndex(modelId, accessKey, secretKey, accountId, publicUrl);
+        } catch (error) {
+            console.warn('Failed to update Cloudflare index:', error.message);
+            throw new Error('Failed to remove from Cloudflare index. Files may still exist in R2.');
+        }
+        
+        console.log('Model removed from Cloudflare index. Note: Files may still exist in R2 and need manual cleanup.');
+    }
+
+    async removeFromCloudflareIndex(modelId, accessKey, secretKey, accountId, publicUrl) {
+        // Get existing index
+        let index = [];
+        try {
+            const indexResponse = await fetch(`${publicUrl}/models/index.json`);
+            if (indexResponse.ok) {
+                index = await indexResponse.json();
+            }
+        } catch (e) {
+            // Index doesn't exist, nothing to update
+            return;
+        }
+
+        // Remove model ID from index
+        const originalLength = index.length;
+        index = index.filter(id => id !== modelId);
+        
+        if (index.length === originalLength) {
+            // Model wasn't in index, nothing to update
+            return;
+        }
+        
+        // Upload updated index
+        await this.uploadToCloudflareR2(
+            'models/index.json',
+            new TextEncoder().encode(JSON.stringify(index, null, 2)),
+            'application/json',
+            accessKey,
+            secretKey,
+            accountId,
+            publicUrl
+        );
     }
 
     base64ToArrayBuffer(base64) {
@@ -1562,12 +1774,66 @@ usdz-converter input.glb output.usdz</pre>
         alert('Edit functionality will be implemented here');
     }
 
-    deleteModel(modelId) {
-        if (confirm('Are you sure you want to delete this model?')) {
+    async deleteModel(modelId) {
+        if (!confirm('Are you sure you want to delete this model? This will also remove it from GitHub.')) {
+            return;
+        }
+        
+        const model = this.models.find(m => m.id === modelId);
+        if (!model) {
+            alert('Model not found');
+            return;
+        }
+        
+        // Show deleting status
+        const statusMsg = document.getElementById('publishing-status');
+        if (statusMsg) {
+            statusMsg.textContent = '🗑️ Deleting model...';
+            statusMsg.style.color = '#f59e0b';
+        }
+        
+        try {
+            let deletionMessage = 'Model deleted from local storage';
+            
+            // Delete from GitHub if storage type is GitHub and credentials are configured
+            if (this.publishing.storageType === 'github' && this.publishing.githubToken) {
+                await this.deleteFromGitHub(modelId);
+                deletionMessage += ' and GitHub';
+            } else if (this.publishing.storageType === 'cloudflare' && this.publishing.accessKey) {
+                await this.deleteFromCloudflare(modelId);
+                deletionMessage += ' and Cloudflare index (files may need manual cleanup)';
+            }
+            
+            // Delete from local storage
             this.models = this.models.filter(m => m.id !== modelId);
             this.saveModels();
             this.renderFolders();
             this.loadModels();
+            
+            if (statusMsg) {
+                statusMsg.textContent = '✅ Model deleted successfully!';
+                statusMsg.style.color = '#22c55e';
+                setTimeout(() => {
+                    statusMsg.textContent = '';
+                }, 3000);
+            }
+            
+            alert(deletionMessage + '!');
+        } catch (error) {
+            console.error('Error deleting model:', error);
+            
+            if (statusMsg) {
+                statusMsg.textContent = `❌ Error deleting from GitHub: ${error.message}`;
+                statusMsg.style.color = '#ef4444';
+            }
+            
+            // Still delete locally even if GitHub deletion fails
+            if (confirm('Failed to delete from GitHub. Delete from local storage only?')) {
+                this.models = this.models.filter(m => m.id !== modelId);
+                this.saveModels();
+                this.renderFolders();
+                this.loadModels();
+            }
         }
     }
 
