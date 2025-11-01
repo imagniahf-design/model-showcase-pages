@@ -1430,7 +1430,7 @@ class ModelShowcase {
                     ios-src="${iosUsdzUrl}"
                     alt="${name}"
                     ar 
-                    ar-modes="scene-viewer quick-look webxr" 
+                    ar-modes="scene-viewer webxr" 
                     camera-controls 
                     auto-rotate 
                     autoplay
