@@ -40,7 +40,14 @@
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             text-decoration: none;
-            z-index: 10;
+            z-index: 1000;
+            pointer-events: auto;
+            -webkit-tap-highlight-color: rgba(0, 122, 255, 0.3);
+            touch-action: manipulation;
+        }
+        .ios-ar-link:active {
+            transform: translateX(-50%) scale(0.95);
+            background: #0051D5;
         }
         @media (max-width: 768px) {
             .ar-button, .ios-ar-link {
@@ -93,7 +100,7 @@
             </div>
         </main>
     </div>
-    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+        <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <script>
         // iOS capability detection and AR button management
         document.addEventListener('DOMContentLoaded', function() {
@@ -105,27 +112,26 @@
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
             const supportsQuickLook = isIOS && 'ontouchstart' in window;
             
+            console.log('Device detection:', { isIOS, supportsQuickLook });
+            
             if (supportsQuickLook) {
                 // Hide model-viewer AR button, show native iOS AR link
                 if (arButton) arButton.style.display = 'none';
-                if (iosArLink) iosArLink.style.display = 'block';
+                if (iosArLink) {
+                    iosArLink.style.display = 'inline-block';
+                    console.log('iOS AR link shown:', iosArLink.href);
+                    
+                    // Add click handler for debugging
+                    iosArLink.addEventListener('click', function(e) {
+                        console.log('iOS AR link clicked!', this.href);
+                        // Let the default behavior happen (open in AR)
+                    });
+                }
             } else {
                 // Show model-viewer AR button, hide iOS link
                 if (arButton) arButton.style.display = 'block';
                 if (iosArLink) iosArLink.style.display = 'none';
             }
-            
-            // Test USDZ accessibility
-            fetch('https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1759499339991_07j8y5btu/model.usdz', { method: 'HEAD' })
-                .then(response => {
-                    console.log('USDZ accessibility test:', response.status, response.headers.get('content-type'));
-                    if (response.status !== 200) {
-                        console.warn('USDZ file may not be accessible:', response.status);
-                    }
-                })
-                .catch(error => {
-                    console.error('USDZ accessibility test failed:', error);
-                });
         });
     </script>
 </body>

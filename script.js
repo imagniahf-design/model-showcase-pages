@@ -1157,7 +1157,14 @@ class ModelShowcase {
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             text-decoration: none;
-            z-index: 10;
+            z-index: 1000;
+            pointer-events: auto;
+            -webkit-tap-highlight-color: rgba(0, 122, 255, 0.3);
+            touch-action: manipulation;
+        }
+        .ios-ar-link:active {
+            transform: translateX(-50%) scale(0.95);
+            background: #0051D5;
         }
         @media (max-width: 768px) {
             .ar-button, .ios-ar-link {
@@ -1194,10 +1201,10 @@ class ModelShowcase {
                     <button slot="ar-button" class="ar-button">START AR</button>
                 </model-viewer>
                 
-                <!-- iOS Quick Look fallback button -->
-                <button onclick="openInAR('${iosUsdzUrl}')" class="ios-ar-link" id="ios-ar-link">
+                <!-- iOS Quick Look fallback link -->
+                <a href="${iosUsdzUrl}" rel="ar" class="ios-ar-link" id="ios-ar-link">
                     📱 Start AR (iOS)
-                </button>
+                </a>
             </div>
             
             <!-- Debug info (remove in production) -->
@@ -1224,10 +1231,20 @@ class ModelShowcase {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
             const supportsQuickLook = isIOS && 'ontouchstart' in window;
             
+            console.log('Device detection:', { isIOS, supportsQuickLook });
+            
             if (supportsQuickLook) {
                 // Hide model-viewer AR button, show native iOS AR link
                 if (arButton) arButton.style.display = 'none';
-                if (iosArLink) iosArLink.style.display = 'block';
+                if (iosArLink) {
+                    iosArLink.style.display = 'inline-block';
+                    console.log('iOS AR link shown with rel="ar", URL:', iosArLink.href);
+                    
+                    // Add click handler for debugging
+                    iosArLink.addEventListener('click', function(e) {
+                        console.log('iOS AR link clicked!', this.href);
+                    });
+                }
             } else {
                 // Show model-viewer AR button, hide iOS link
                 if (arButton) arButton.style.display = 'block';
