@@ -1475,25 +1475,42 @@ class ModelShowcase {
     <script>
         // Preload USDZ file for instant AR experience
         let usdzBlobUrl = null;
+        let isPreloading = true;
         
         function preloadUSDZ() {
             const usdzUrl = '${iosUsdzUrl}';
+            const iosArLink = document.querySelector('#ios-ar-link');
+            
+            // Show loading state
+            if (iosArLink) {
+                iosArLink.style.opacity = '0.5';
+                iosArLink.style.pointerEvents = 'none';
+                iosArLink.innerHTML = '⏳ Loading AR...';
+            }
             
             // Fetch USDZ file in background
             fetch(usdzUrl)
                 .then(response => response.blob())
                 .then(blob => {
-                    // Create blob URL from preloaded file
+                    // Create blob URL from downloaded file
                     usdzBlobUrl = URL.createObjectURL(blob);
                     
-                    // Update AR link to use blob URL for instant opening
-                    const iosArLink = document.querySelector('#ios-ar-link');
+                    // Update AR link to use blob URL - NO CDN REDIRECT!
                     if (iosArLink && usdzBlobUrl) {
                         iosArLink.href = usdzBlobUrl;
+                        iosArLink.style.opacity = '1';
+                        iosArLink.style.pointerEvents = 'auto';
+                        iosArLink.innerHTML = '📱 Start AR (iOS)';
+                        isPreloading = false;
                     }
                 })
                 .catch(error => {
-                    console.warn('Failed to preload USDZ, using CDN URL');
+                    // If preload fails, use CDN URL as fallback
+                    if (iosArLink) {
+                        iosArLink.style.opacity = '1';
+                        iosArLink.style.pointerEvents = 'auto';
+                        iosArLink.innerHTML = '📱 Start AR (iOS)';
+                    }
                 });
         }
         
