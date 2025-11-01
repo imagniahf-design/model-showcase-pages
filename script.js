@@ -1342,8 +1342,8 @@ class ModelShowcase {
         const rawUsdzUrl = usdzUrl.replace('api.github.com/repos/', 'raw.githubusercontent.com/').replace('/contents/', '/').replace('?ref=main', '');
         const rawPosterUrl = previewImage.replace('api.github.com/repos/', 'raw.githubusercontent.com/').replace('/contents/', '/').replace('?ref=main', '');
         
-        // Add iOS-specific parameters to USDZ URL for better compatibility
-        const iosUsdzUrl = `${rawUsdzUrl}#allowsContentScaling=1&filename=${encodeURIComponent(name)}.usdz`;
+        // Use clean USDZ URL for iOS AR Quick Look
+        const iosUsdzUrl = rawUsdzUrl;
         
         return `<!DOCTYPE html>
 <html lang="en">
@@ -1436,17 +1436,6 @@ class ModelShowcase {
                     📱 Start AR (iOS)
                 </a>
             </div>
-            
-            <!-- Debug info (remove in production) -->
-            <div style="background: #1e293b; border-radius: 0.5rem; padding: 1rem; margin-top: 1rem; font-size: 0.8rem; color: #94a3b8;">
-                <details>
-                    <summary>🔧 Debug Info</summary>
-                    <p><strong>GLB URL:</strong> <a href="${rawGlbUrl}" target="_blank" style="color: #60a5fa;">${rawGlbUrl}</a></p>
-                    <p><strong>USDZ URL:</strong> <a href="${rawUsdzUrl}" target="_blank" style="color: #60a5fa;">${rawUsdzUrl}</a></p>
-                    <p><strong>iOS USDZ:</strong> <a href="${iosUsdzUrl}" target="_blank" style="color: #60a5fa;">${iosUsdzUrl}</a></p>
-                    <p><strong>Poster:</strong> <a href="${rawPosterUrl}" target="_blank" style="color: #60a5fa;">${rawPosterUrl}</a></p>
-                </details>
-            </div>
         </main>
     </div>
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
@@ -1461,37 +1450,17 @@ class ModelShowcase {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
             const supportsQuickLook = isIOS && 'ontouchstart' in window;
             
-            console.log('Device detection:', { isIOS, supportsQuickLook });
-            
             if (supportsQuickLook) {
                 // Hide model-viewer AR button, show native iOS AR link
                 if (arButton) arButton.style.display = 'none';
                 if (iosArLink) {
                     iosArLink.style.display = 'inline-block';
-                    console.log('iOS AR link shown with rel="ar", URL:', iosArLink.href);
-                    
-                    // Add click handler for debugging
-                    iosArLink.addEventListener('click', function(e) {
-                        console.log('iOS AR link clicked!', this.href);
-                    });
                 }
             } else {
                 // Show model-viewer AR button, hide iOS link
                 if (arButton) arButton.style.display = 'block';
                 if (iosArLink) iosArLink.style.display = 'none';
             }
-            
-            // Test USDZ accessibility
-            fetch('${rawUsdzUrl}', { method: 'HEAD' })
-                .then(response => {
-                    console.log('USDZ accessibility test:', response.status, response.headers.get('content-type'));
-                    if (response.status !== 200) {
-                        console.warn('USDZ file may not be accessible:', response.status);
-                    }
-                })
-                .catch(error => {
-                    console.error('USDZ accessibility test failed:', error);
-                });
         });
     </script>
 </body>

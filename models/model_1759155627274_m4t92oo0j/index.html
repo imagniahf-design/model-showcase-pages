@@ -45,21 +45,12 @@
             // Check if device supports iOS Quick Look
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
             const supportsQuickLook = isIOS && 'ontouchstart' in window;
-            
-            console.log('Device detection:', { isIOS, supportsQuickLook });
-            
+
             if (supportsQuickLook) {
                 // Hide model-viewer AR button, show native iOS AR link
                 if (arButton) arButton.style.display = 'none';
                 if (iosArLink) {
-                    iosArLink.style.display = 'inline-block';
-                    console.log('iOS AR link shown:', iosArLink.href);
-                    
-                    // Add click handler for debugging
-                    iosArLink.addEventListener('click', function(e) {
-                        console.log('iOS AR link clicked!', this.href);
-                        // Let the default behavior happen (open in AR)
-                    });
+                    iosArLink.style.display = 'inline-block';});
                 }
             } else {
                 // Show model-viewer AR button, hide iOS link

@@ -85,21 +85,11 @@
                 </model-viewer>
                 
                 <!-- iOS Quick Look fallback link -->
-                <a href="https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1760014408249_1dbrz9bhi/model.usdz#allowsContentScaling=1&filename=3DModel.usdz" rel="ar" class="ios-ar-link" id="ios-ar-link">
+                <a href="https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1760014408249_1dbrz9bhi/model.usdz" rel="ar" class="ios-ar-link" id="ios-ar-link">
                     📱 Start AR (iOS)
                 </a>
             </div>
-            
-            <!-- Debug info (remove in production) -->
-            <div style="background: #1e293b; border-radius: 0.5rem; padding: 1rem; margin-top: 1rem; font-size: 0.8rem; color: #94a3b8;">
-                <details>
-                    <summary>🔧 Debug Info</summary>
-                    <p><strong>GLB URL:</strong> <a href="https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1760014408249_1dbrz9bhi/model.glb" target="_blank" style="color: #60a5fa;">https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1760014408249_1dbrz9bhi/model.glb</a></p>
-                    <p><strong>USDZ URL:</strong> <a href="https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1760014408249_1dbrz9bhi/model.usdz" target="_blank" style="color: #60a5fa;">https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1760014408249_1dbrz9bhi/model.usdz</a></p>
-                    <p><strong>iOS USDZ:</strong> <a href="https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1760014408249_1dbrz9bhi/model.usdz#allowsContentScaling=1&filename=3DModel.usdz" target="_blank" style="color: #60a5fa;">https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1760014408249_1dbrz9bhi/model.usdz#allowsContentScaling=1&filename=3DModel.usdz</a></p>
-                    <p><strong>Poster:</strong> <a href="https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1760014408249_1dbrz9bhi/poster.jpg" target="_blank" style="color: #60a5fa;">https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1760014408249_1dbrz9bhi/poster.jpg</a></p>
-                </details>
-            </div>
+
         </main>
     </div>
         <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
@@ -113,21 +103,12 @@
             // Check if device supports iOS Quick Look
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
             const supportsQuickLook = isIOS && 'ontouchstart' in window;
-            
-            console.log('Device detection:', { isIOS, supportsQuickLook });
-            
+
             if (supportsQuickLook) {
                 // Hide model-viewer AR button, show native iOS AR link
                 if (arButton) arButton.style.display = 'none';
                 if (iosArLink) {
-                    iosArLink.style.display = 'inline-block';
-                    console.log('iOS AR link shown:', iosArLink.href);
-                    
-                    // Add click handler for debugging
-                    iosArLink.addEventListener('click', function(e) {
-                        console.log('iOS AR link clicked!', this.href);
-                        // Let the default behavior happen (open in AR)
-                    });
+                    iosArLink.style.display = 'inline-block';});
                 }
             } else {
                 // Show model-viewer AR button, hide iOS link
