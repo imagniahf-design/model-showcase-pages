@@ -347,6 +347,24 @@ class ModelShowcase {
                 if (githubRepo) githubRepo.value = this.publishing.githubRepo;
             }
         }
+
+        // Edit modal event listeners
+        const editSaveBtn = document.getElementById('edit-save');
+        const editCancelBtn = document.getElementById('edit-cancel');
+        const editModal = document.getElementById('edit-modal');
+
+        if (editSaveBtn && editCancelBtn && editModal) {
+            editSaveBtn.addEventListener('click', () => this.saveEdit());
+            editCancelBtn.addEventListener('click', () => this.closeEditModal());
+            
+            // Close modal when clicking outside
+            editModal.addEventListener('click', (e) => {
+                if (e.target === editModal) {
+                    this.closeEditModal();
+                }
+            });
+        }
+
         this.eventsBound = true;
     }
 
@@ -1748,6 +1766,7 @@ usdz-converter input.glb output.usdz</pre>
                 <button class="view-btn" onclick="modelShowcase.viewModel('${model.id}')">View</button>
                 <button class="upload-btn" onclick="modelShowcase.publishOne('${model.id}')">Publish</button>
                 <button class="view-btn" onclick="modelShowcase.copyShareLink('${model.id}')">Share</button>
+                <button class="view-btn" onclick="modelShowcase.openEdit('${model.id}')">✏️ Edit</button>
                 <button class="edit-btn" onclick="modelShowcase.toggleFavorite('${model.id}')">${model.isFavorite ? '💛' : '🤍'}</button>
                 <button class="edit-btn" onclick="modelShowcase.moveToFolder('${model.id}')">📁</button>
                 <button class="delete-btn" onclick="modelShowcase.deleteModel('${model.id}')">Delete</button>
@@ -1770,8 +1789,189 @@ usdz-converter input.glb output.usdz</pre>
     }
 
     openEdit(modelId) {
-        // Edit functionality placeholder
-        alert('Edit functionality will be implemented here');
+        const model = this.models.find(m => m.id === modelId);
+        if (!model) {
+            alert('Model not found');
+            return;
+        }
+
+        // Store the current model ID being edited
+        this.currentEditModelId = modelId;
+
+        // Populate the modal with current values
+        document.getElementById('edit-title').value = model.name || '';
+        document.getElementById('edit-desc').value = model.description || '';
+        
+        // Clear file inputs
+        document.getElementById('edit-preview').value = '';
+        document.getElementById('edit-glb').value = '';
+        document.getElementById('edit-usdz').value = '';
+
+        // Show the modal
+        const modal = document.getElementById('edit-modal');
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+    }
+
+    closeEditModal() {
+        const modal = document.getElementById('edit-modal');
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+        this.currentEditModelId = null;
+    }
+
+    async saveEdit() {
+        if (!this.currentEditModelId) {
+            alert('No model selected for editing');
+            return;
+        }
+
+        const model = this.models.find(m => m.id === this.currentEditModelId);
+        if (!model) {
+            alert('Model not found');
+            return;
+        }
+
+        // Get new values from form
+        const newName = document.getElementById('edit-title').value.trim();
+        const newDesc = document.getElementById('edit-desc').value.trim();
+        const previewFile = document.getElementById('edit-preview').files[0];
+        const glbFile = document.getElementById('edit-glb').files[0];
+        const usdzFile = document.getElementById('edit-usdz').files[0];
+
+        if (!newName) {
+            alert('Please enter a model name');
+            return;
+        }
+
+        // Show progress
+        const statusMsg = document.getElementById('publishing-status');
+        if (statusMsg) {
+            statusMsg.textContent = '💾 Saving changes...';
+            statusMsg.style.color = '#3b82f6';
+        }
+
+        try {
+            // Store old name for GitHub update
+            const oldName = model.name;
+            const hasNameChanged = oldName !== newName;
+
+            // Update model metadata
+            model.name = newName;
+            model.description = newDesc;
+
+            // Update preview image if provided
+            if (previewFile) {
+                model.previewImage = await this.fileToBase64(previewFile);
+            }
+
+            // Save to local storage
+            this.saveModels();
+            this.loadModels();
+
+            // If model is published to GitHub, update it there
+            if (model.uploaded && this.publishing.storageType === 'github' && this.publishing.githubToken) {
+                await this.updateModelOnGitHub(model, { glbFile, usdzFile, hasNameChanged });
+            }
+
+            if (statusMsg) {
+                statusMsg.textContent = '✅ Changes saved successfully!';
+                statusMsg.style.color = '#22c55e';
+                setTimeout(() => {
+                    statusMsg.textContent = '';
+                }, 3000);
+            }
+
+            this.closeEditModal();
+            alert('Model updated successfully!');
+        } catch (error) {
+            console.error('Error saving changes:', error);
+            
+            if (statusMsg) {
+                statusMsg.textContent = `❌ Error: ${error.message}`;
+                statusMsg.style.color = '#ef4444';
+            }
+
+            alert(`Failed to save changes: ${error.message}`);
+        }
+    }
+
+    async updateModelOnGitHub(model, options = {}) {
+        const { glbFile, usdzFile, hasNameChanged } = options;
+        const { githubToken, githubUsername, githubRepo } = this.publishing;
+
+        console.log('Updating model on GitHub:', model.id);
+
+        // Update manifest file with new name/description
+        const manifestUrl = await this.getGitHubFileUrl(`models/${model.id}.json`);
+        if (manifestUrl) {
+            const manifest = {
+                id: model.id,
+                name: model.name,
+                description: model.description,
+                glbFile: manifestUrl.glbUrl || `https://raw.githubusercontent.com/${githubUsername}/${githubRepo}/main/models/${model.id}/model.glb`,
+                usdzFile: manifestUrl.usdzUrl || `https://raw.githubusercontent.com/${githubUsername}/${githubRepo}/main/models/${model.id}/model.usdz`,
+                previewImage: model.previewImage,
+                createdAt: model.createdAt,
+                theme: model.theme || {}
+            };
+
+            await this.uploadToGitHub(`models/${model.id}.json`, JSON.stringify(manifest, null, 2));
+        }
+
+        // Update poster image
+        await this.uploadToGitHub(`models/${model.id}/poster.jpg`, model.previewImage);
+
+        // Update GLB file if provided
+        if (glbFile) {
+            const glbBase64 = await this.fileToBase64(glbFile);
+            await this.uploadToGitHub(`models/${model.id}/model.glb`, glbBase64);
+        }
+
+        // Update USDZ file if provided
+        if (usdzFile) {
+            const usdzBase64 = await this.fileToBase64(usdzFile);
+            await this.uploadToGitHub(`models/${model.id}/model.usdz`, usdzBase64);
+        }
+
+        // Regenerate the index.html page with updated name
+        const rawGlbUrl = `https://raw.githubusercontent.com/${githubUsername}/${githubRepo}/main/models/${model.id}/model.glb`;
+        const rawUsdzUrl = `https://raw.githubusercontent.com/${githubUsername}/${githubRepo}/main/models/${model.id}/model.usdz`;
+        const rawPosterUrl = `https://raw.githubusercontent.com/${githubUsername}/${githubRepo}/main/models/${model.id}/poster.jpg`;
+
+        const pageHtml = this.buildStandaloneModelPage({
+            name: model.name,
+            description: model.description || '',
+            glbUrl: rawGlbUrl,
+            usdzUrl: rawUsdzUrl,
+            previewImage: rawPosterUrl
+        });
+
+        await this.uploadToGitHub(`models/${model.id}/index.html`, pageHtml);
+
+        console.log('Model updated on GitHub successfully');
+    }
+
+    async getGitHubFileUrl(filePath) {
+        const { githubToken, githubUsername, githubRepo } = this.publishing;
+        
+        try {
+            const response = await fetch(`https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/${filePath}`, {
+                headers: { 'Authorization': `token ${githubToken}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                return {
+                    url: data.download_url,
+                    sha: data.sha
+                };
+            }
+        } catch (error) {
+            console.warn(`Could not fetch ${filePath}:`, error);
+        }
+        
+        return null;
     }
 
     async deleteModel(modelId) {
