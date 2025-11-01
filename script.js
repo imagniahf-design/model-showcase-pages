@@ -1426,8 +1426,7 @@ class ModelShowcase {
         <main style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
             <div style="background: #1e293b; border-radius: 1rem; padding: 1rem; margin-bottom: 2rem; position: relative;">
                 <model-viewer 
-                    src="${rawGlbUrl}" 
-                    ios-src="${iosUsdzUrl}"
+                    src="${rawGlbUrl}"
                     alt="${name}"
                     ar 
                     ar-modes="scene-viewer webxr" 
@@ -1443,7 +1442,7 @@ class ModelShowcase {
                     <button slot="ar-button" class="ar-button">START AR</button>
                 </model-viewer>
                 
-                <!-- iOS Quick Look fallback link -->
+                <!-- iOS Quick Look direct link -->
                 <a href="${iosUsdzUrl}" rel="ar" class="ios-ar-link" id="ios-ar-link">
                     📱 Start AR (iOS)
                 </a>
