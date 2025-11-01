@@ -116,5 +116,40 @@
             }
         });
     </script>
+
+    <script>
+        // Preload USDZ file for instant AR experience
+        let usdzBlobUrl = null;
+        
+        function preloadUSDZ() {
+            const usdzUrl = 'https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1761773878057_o2t7j0oef/model.usdz#allowsContentScaling=1&filename=burrito.usdz';
+            
+            // Fetch USDZ file in background
+            fetch(usdzUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    // Create blob URL
+                    usdzBlobUrl = URL.createObjectURL(blob);
+                    
+                    // Update AR link to use blob URL
+                    const iosArLink = document.querySelector('#ios-ar-link');
+                    if (iosArLink && usdzBlobUrl) {
+                        iosArLink.href = usdzBlobUrl;
+                        console.log('USDZ preloaded - AR will open instantly!');
+                    }
+                })
+                .catch(error => {
+                    console.warn('Failed to preload USDZ:', error);
+                    // Fallback: keep original URL
+                });
+        }
+        
+        // Start preloading when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', preloadUSDZ);
+        } else {
+            preloadUSDZ();
+        }
+    </script>
 </body>
 </html>

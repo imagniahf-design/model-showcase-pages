@@ -1472,6 +1472,38 @@ class ModelShowcase {
             }
         });
     </script>
+    <script>
+        // Preload USDZ file for instant AR experience
+        let usdzBlobUrl = null;
+        
+        function preloadUSDZ() {
+            const usdzUrl = '${iosUsdzUrl}';
+            
+            // Fetch USDZ file in background
+            fetch(usdzUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    // Create blob URL from preloaded file
+                    usdzBlobUrl = URL.createObjectURL(blob);
+                    
+                    // Update AR link to use blob URL for instant opening
+                    const iosArLink = document.querySelector('#ios-ar-link');
+                    if (iosArLink && usdzBlobUrl) {
+                        iosArLink.href = usdzBlobUrl;
+                    }
+                })
+                .catch(error => {
+                    console.warn('Failed to preload USDZ, using CDN URL');
+                });
+        }
+        
+        // Start preloading when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', preloadUSDZ);
+        } else {
+            preloadUSDZ();
+        }
+    </script>
 </body>
 </html>`;
     }
