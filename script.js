@@ -1337,19 +1337,18 @@ class ModelShowcase {
     }
 
     buildStandaloneModelPage({ name, description, glbUrl, usdzUrl, previewImage }) {
-        // Convert GitHub API URLs to jsDelivr CDN URLs for proper MIME types
-        const convertToJsDelivr = (url) => {
+        // Convert GitHub API URLs to GitHub Pages URLs for direct AR
+        const convertToGitHubPages = (url) => {
             return url
-                .replace('api.github.com/repos/', 'cdn.jsdelivr.net/gh/')
-                .replace('/contents/', '@main/')
+                .replace('api.github.com/repos/imagniahf-design/model-showcase-pages/contents/', 'imagniahf-design.github.io/model-showcase-pages/')
                 .replace('?ref=main', '')
-                .replace('raw.githubusercontent.com/', 'cdn.jsdelivr.net/gh/')
-                .replace('/main/', '@main/');
+                .replace('raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/', 'imagniahf-design.github.io/model-showcase-pages/')
+                .replace('cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/', 'imagniahf-design.github.io/model-showcase-pages/');
         };
         
-        const rawGlbUrl = convertToJsDelivr(glbUrl);
-        const rawUsdzUrl = convertToJsDelivr(usdzUrl);
-        const rawPosterUrl = convertToJsDelivr(previewImage);
+        const rawGlbUrl = convertToGitHubPages(glbUrl);
+        const rawUsdzUrl = convertToGitHubPages(usdzUrl);
+        const rawPosterUrl = convertToGitHubPages(previewImage);
         
         // Use clean USDZ URL for iOS AR Quick Look
         const iosUsdzUrl = rawUsdzUrl;
@@ -1471,55 +1470,6 @@ class ModelShowcase {
                 if (iosArLink) iosArLink.style.display = 'none';
             }
         });
-    </script>
-    <script>
-        // Preload USDZ file for instant AR experience
-        let usdzBlobUrl = null;
-        let isPreloading = true;
-        
-        function preloadUSDZ() {
-            const usdzUrl = '${iosUsdzUrl}';
-            const iosArLink = document.querySelector('#ios-ar-link');
-            
-            // Show loading state
-            if (iosArLink) {
-                iosArLink.style.opacity = '0.5';
-                iosArLink.style.pointerEvents = 'none';
-                iosArLink.innerHTML = '⏳ Loading AR...';
-            }
-            
-            // Fetch USDZ file in background
-            fetch(usdzUrl)
-                .then(response => response.blob())
-                .then(blob => {
-                    // Create blob URL from downloaded file
-                    usdzBlobUrl = URL.createObjectURL(blob);
-                    
-                    // Update AR link to use blob URL - NO CDN REDIRECT!
-                    if (iosArLink && usdzBlobUrl) {
-                        iosArLink.href = usdzBlobUrl;
-                        iosArLink.style.opacity = '1';
-                        iosArLink.style.pointerEvents = 'auto';
-                        iosArLink.innerHTML = '📱 Start AR (iOS)';
-                        isPreloading = false;
-                    }
-                })
-                .catch(error => {
-                    // If preload fails, use CDN URL as fallback
-                    if (iosArLink) {
-                        iosArLink.style.opacity = '1';
-                        iosArLink.style.pointerEvents = 'auto';
-                        iosArLink.innerHTML = '📱 Start AR (iOS)';
-                    }
-                });
-        }
-        
-        // Start preloading when page loads
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', preloadUSDZ);
-        } else {
-            preloadUSDZ();
-        }
     </script>
 </body>
 </html>`;
@@ -1961,10 +1911,10 @@ usdz-converter input.glb output.usdz</pre>
             await this.uploadToGitHub(`models/${model.id}/model.usdz`, usdzBase64);
         }
 
-        // Regenerate the index.html page with updated name (using jsDelivr for proper MIME types)
-        const rawGlbUrl = `https://cdn.jsdelivr.net/gh/${githubUsername}/${githubRepo}@main/models/${model.id}/model.glb`;
-        const rawUsdzUrl = `https://cdn.jsdelivr.net/gh/${githubUsername}/${githubRepo}@main/models/${model.id}/model.usdz`;
-        const rawPosterUrl = `https://cdn.jsdelivr.net/gh/${githubUsername}/${githubRepo}@main/models/${model.id}/poster.jpg`;
+        // Regenerate the index.html page with updated name (using GitHub Pages for direct AR)
+        const rawGlbUrl = `https://${githubUsername}.github.io/${githubRepo}/models/${model.id}/model.glb`;
+        const rawUsdzUrl = `https://${githubUsername}.github.io/${githubRepo}/models/${model.id}/model.usdz`;
+        const rawPosterUrl = `https://${githubUsername}.github.io/${githubRepo}/models/${model.id}/poster.jpg`;
 
         const pageHtml = this.buildStandaloneModelPage({
             name: model.name,

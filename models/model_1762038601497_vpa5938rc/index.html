@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>burrito1 - 3D Model</title>
+    <title>burrito0 - 3D Model</title>
     <link rel="stylesheet" href="../../styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
@@ -61,22 +61,22 @@
 <body>
     <div style="background: #0f172a; color: white; font-family: Inter, sans-serif; min-height: 100vh;">
         <header style="padding: 1rem; text-align: center; border-bottom: 1px solid #1e293b;">
-            <h1 style="margin: 0; font-size: 1.5rem;">🎯 burrito1</h1>
+            <h1 style="margin: 0; font-size: 1.5rem;">🎯 burrito0</h1>
             
         </header>
         <main style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
             <div style="background: #1e293b; border-radius: 1rem; padding: 1rem; margin-bottom: 2rem; position: relative;">
                 <model-viewer 
-                    src="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1762038601497_vpa5938rc/model.glb" 
-                    ios-src="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1762038601497_vpa5938rc/model.usdz"
-                    alt="burrito1"
+                    src="https://imagniahf-design.github.io/model-showcase-pages/models/model_1762037801610_sxyuex30t/model.glb" 
+                    ios-src="https://imagniahf-design.github.io/model-showcase-pages/models/model_1762037801610_sxyuex30t/model.usdz"
+                    alt="burrito0"
                     ar 
                     ar-modes="scene-viewer quick-look webxr" 
                     camera-controls 
                     auto-rotate 
                     autoplay
                     environment-image="neutral" 
-                    poster="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1762038601497_vpa5938rc/poster.jpg"
+                    poster="https://imagniahf-design.github.io/model-showcase-pages/models/model_1762037801610_sxyuex30t/poster.jpg"
                     ar-placement="floor"
                     ar-scale="auto"
                     interaction-policy="allow-when-focused"
@@ -85,7 +85,7 @@
                 </model-viewer>
                 
                 <!-- iOS Quick Look fallback link -->
-                <a href="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1762038601497_vpa5938rc/model.usdz" rel="ar" class="ios-ar-link" id="ios-ar-link">
+                <a href="https://imagniahf-design.github.io/model-showcase-pages/models/model_1762037801610_sxyuex30t/model.usdz" rel="ar" class="ios-ar-link" id="ios-ar-link">
                     📱 Start AR (iOS)
                 </a>
             </div>
@@ -116,54 +116,7 @@
             }
         });
     </script>
-    <script>
-        // Preload USDZ file for instant AR experience
-        let usdzBlobUrl = null;
-        let isPreloading = true;
-        
-        function preloadUSDZ() {
-            const usdzUrl = 'https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1762038601497_vpa5938rc/model.usdz';
-            const iosArLink = document.querySelector('#ios-ar-link');
-            
-            // Show loading state
-            if (iosArLink) {
-                iosArLink.style.opacity = '0.5';
-                iosArLink.style.pointerEvents = 'none';
-                iosArLink.innerHTML = '⏳ Loading AR...';
-            }
-            
-            // Fetch USDZ file in background
-            fetch(usdzUrl)
-                .then(response => response.blob())
-                .then(blob => {
-                    // Create blob URL from downloaded file
-                    usdzBlobUrl = URL.createObjectURL(blob);
-                    
-                    // Update AR link to use blob URL - NO CDN REDIRECT!
-                    if (iosArLink && usdzBlobUrl) {
-                        iosArLink.href = usdzBlobUrl;
-                        iosArLink.style.opacity = '1';
-                        iosArLink.style.pointerEvents = 'auto';
-                        iosArLink.innerHTML = '📱 Start AR (iOS)';
-                        isPreloading = false;
-                    }
-                })
-                .catch(error => {
-                    // If preload fails, use CDN URL as fallback
-                    if (iosArLink) {
-                        iosArLink.style.opacity = '1';
-                        iosArLink.style.pointerEvents = 'auto';
-                        iosArLink.innerHTML = '📱 Start AR (iOS)';
-                    }
-                });
-        }
-        
-        // Start preloading when page loads
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', preloadUSDZ);
-        } else {
-            preloadUSDZ();
-        }
-    </script>
+
+    
 </body>
 </html>
