@@ -1337,10 +1337,19 @@ class ModelShowcase {
     }
 
     buildStandaloneModelPage({ name, description, glbUrl, usdzUrl, previewImage }) {
-        // Convert GitHub API URLs to raw content URLs for direct access
-        const rawGlbUrl = glbUrl.replace('api.github.com/repos/', 'raw.githubusercontent.com/').replace('/contents/', '/').replace('?ref=main', '');
-        const rawUsdzUrl = usdzUrl.replace('api.github.com/repos/', 'raw.githubusercontent.com/').replace('/contents/', '/').replace('?ref=main', '');
-        const rawPosterUrl = previewImage.replace('api.github.com/repos/', 'raw.githubusercontent.com/').replace('/contents/', '/').replace('?ref=main', '');
+        // Convert GitHub API URLs to jsDelivr CDN URLs for proper MIME types
+        const convertToJsDelivr = (url) => {
+            return url
+                .replace('api.github.com/repos/', 'cdn.jsdelivr.net/gh/')
+                .replace('/contents/', '@main/')
+                .replace('?ref=main', '')
+                .replace('raw.githubusercontent.com/', 'cdn.jsdelivr.net/gh/')
+                .replace('/main/', '@main/');
+        };
+        
+        const rawGlbUrl = convertToJsDelivr(glbUrl);
+        const rawUsdzUrl = convertToJsDelivr(usdzUrl);
+        const rawPosterUrl = convertToJsDelivr(previewImage);
         
         // Use clean USDZ URL for iOS AR Quick Look
         const iosUsdzUrl = rawUsdzUrl;
@@ -1903,10 +1912,10 @@ usdz-converter input.glb output.usdz</pre>
             await this.uploadToGitHub(`models/${model.id}/model.usdz`, usdzBase64);
         }
 
-        // Regenerate the index.html page with updated name
-        const rawGlbUrl = `https://raw.githubusercontent.com/${githubUsername}/${githubRepo}/main/models/${model.id}/model.glb`;
-        const rawUsdzUrl = `https://raw.githubusercontent.com/${githubUsername}/${githubRepo}/main/models/${model.id}/model.usdz`;
-        const rawPosterUrl = `https://raw.githubusercontent.com/${githubUsername}/${githubRepo}/main/models/${model.id}/poster.jpg`;
+        // Regenerate the index.html page with updated name (using jsDelivr for proper MIME types)
+        const rawGlbUrl = `https://cdn.jsdelivr.net/gh/${githubUsername}/${githubRepo}@main/models/${model.id}/model.glb`;
+        const rawUsdzUrl = `https://cdn.jsdelivr.net/gh/${githubUsername}/${githubRepo}@main/models/${model.id}/model.usdz`;
+        const rawPosterUrl = `https://cdn.jsdelivr.net/gh/${githubUsername}/${githubRepo}@main/models/${model.id}/poster.jpg`;
 
         const pageHtml = this.buildStandaloneModelPage({
             name: model.name,

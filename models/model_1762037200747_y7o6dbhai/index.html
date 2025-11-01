@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>burritoo - 3D Model</title>
+    <title>burrito - 3D Model</title>
     <link rel="stylesheet" href="../../styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
@@ -61,22 +61,22 @@
 <body>
     <div style="background: #0f172a; color: white; font-family: Inter, sans-serif; min-height: 100vh;">
         <header style="padding: 1rem; text-align: center; border-bottom: 1px solid #1e293b;">
-            <h1 style="margin: 0; font-size: 1.5rem;">🎯 burritoo</h1>
+            <h1 style="margin: 0; font-size: 1.5rem;">🎯 burrito</h1>
             
         </header>
         <main style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
             <div style="background: #1e293b; border-radius: 1rem; padding: 1rem; margin-bottom: 2rem; position: relative;">
                 <model-viewer 
-                    src="https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1762037200747_y7o6dbhai/model.glb" 
-                    ios-src="https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1762037200747_y7o6dbhai/model.usdz"
-                    alt="burritoo"
+                    src="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1761773878057_o2t7j0oef/model.glb" 
+                    ios-src="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1761773878057_o2t7j0oef/model.usdz#allowsContentScaling=1&filename=burrito.usdz"
+                    alt="burrito"
                     ar 
                     ar-modes="scene-viewer quick-look webxr" 
                     camera-controls 
                     auto-rotate 
                     autoplay
                     environment-image="neutral" 
-                    poster="https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1762037200747_y7o6dbhai/poster.jpg"
+                    poster="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1761773878057_o2t7j0oef/poster.jpg"
                     ar-placement="floor"
                     ar-scale="auto"
                     interaction-policy="allow-when-focused"
@@ -85,9 +85,20 @@
                 </model-viewer>
                 
                 <!-- iOS Quick Look fallback link -->
-                <a href="https://raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/models/model_1762037200747_y7o6dbhai/model.usdz" rel="ar" class="ios-ar-link" id="ios-ar-link">
+                <a href="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1761773878057_o2t7j0oef/model.usdz#allowsContentScaling=1&filename=burrito.usdz" rel="ar" class="ios-ar-link" id="ios-ar-link">
                     📱 Start AR (iOS)
                 </a>
+            </div>
+            
+            <!-- Debug info (remove in production) -->
+            <div style="background: #1e293b; border-radius: 0.5rem; padding: 1rem; margin-top: 1rem; font-size: 0.8rem; color: #94a3b8;">
+                <details>
+                    <summary>🔧 Debug Info</summary>
+                    <p><strong>GLB URL:</strong> <a href="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1761773878057_o2t7j0oef/model.glb" target="_blank" style="color: #60a5fa;">https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1761773878057_o2t7j0oef/model.glb</a></p>
+                    <p><strong>USDZ URL:</strong> <a href="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1761773878057_o2t7j0oef/model.usdz" target="_blank" style="color: #60a5fa;">https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1761773878057_o2t7j0oef/model.usdz</a></p>
+                    <p><strong>iOS USDZ:</strong> <a href="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1761773878057_o2t7j0oef/model.usdz#allowsContentScaling=1&filename=burrito.usdz" target="_blank" style="color: #60a5fa;">https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1761773878057_o2t7j0oef/model.usdz#allowsContentScaling=1&filename=burrito.usdz</a></p>
+                    <p><strong>Poster:</strong> <a href="https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1761773878057_o2t7j0oef/poster.jpg" target="_blank" style="color: #60a5fa;">https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1761773878057_o2t7j0oef/poster.jpg</a></p>
+                </details>
             </div>
         </main>
     </div>
@@ -103,17 +114,37 @@
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
             const supportsQuickLook = isIOS && 'ontouchstart' in window;
             
+            console.log('Device detection:', { isIOS, supportsQuickLook });
+            
             if (supportsQuickLook) {
                 // Hide model-viewer AR button, show native iOS AR link
                 if (arButton) arButton.style.display = 'none';
                 if (iosArLink) {
                     iosArLink.style.display = 'inline-block';
+                    console.log('iOS AR link shown with rel="ar", URL:', iosArLink.href);
+                    
+                    // Add click handler for debugging
+                    iosArLink.addEventListener('click', function(e) {
+                        console.log('iOS AR link clicked!', this.href);
+                    });
                 }
             } else {
                 // Show model-viewer AR button, hide iOS link
                 if (arButton) arButton.style.display = 'block';
                 if (iosArLink) iosArLink.style.display = 'none';
             }
+            
+            // Test USDZ accessibility
+            fetch('https://cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/models/model_1761773878057_o2t7j0oef/model.usdz', { method: 'HEAD' })
+                .then(response => {
+                    console.log('USDZ accessibility test:', response.status, response.headers.get('content-type'));
+                    if (response.status !== 200) {
+                        console.warn('USDZ file may not be accessible:', response.status);
+                    }
+                })
+                .catch(error => {
+                    console.error('USDZ accessibility test failed:', error);
+                });
         });
     </script>
 </body>
