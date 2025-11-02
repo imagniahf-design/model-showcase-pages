@@ -1260,14 +1260,52 @@ class ModelShowcase {
 
     async createModelPage(model) {
         const pageContent = `<!DOCTYPE html>
+<!-- Version: ${Date.now()} - GitHub Pages Direct AR -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>${model.name} - 3D Model</title>
     <link rel="stylesheet" href="../styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+    <style>
+        .ios-ar-link {
+            display: none;
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            background: #007AFF;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            text-decoration: none;
+            z-index: 1000;
+            pointer-events: auto;
+            -webkit-tap-highlight-color: rgba(0, 122, 255, 0.3);
+            touch-action: manipulation;
+        }
+        .ios-ar-link:active {
+            transform: translateX(-50%) scale(0.95);
+            background: #0051D5;
+        }
+        @media (max-width: 768px) {
+            .ios-ar-link {
+                bottom: 8px;
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div style="background: #0f172a; color: white; font-family: Inter, sans-serif; min-height: 100vh;">
@@ -1295,25 +1333,7 @@ class ModelShowcase {
                 </model-viewer>
                 
                 <!-- iOS Quick Look direct link -->
-                <a href="${model.usdzUrl || '#'}" rel="ar" class="ios-ar-link" id="ios-ar-link" style="
-                    display: none;
-                    position: absolute;
-                    bottom: 16px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    padding: 12px 24px;
-                    font-size: 16px;
-                    font-weight: bold;
-                    background: #007AFF;
-                    color: #fff;
-                    border: none;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                    text-decoration: none;
-                    z-index: 1000;
-                    pointer-events: auto;
-                ">
+                <a href="${model.usdzUrl || '#'}" rel="ar" class="ios-ar-link" id="ios-ar-link">
                     📱 Start AR (iOS)
                 </a>
             </div>
@@ -1336,6 +1356,19 @@ class ModelShowcase {
     </div>
     
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <script>
+        // iOS AR link visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const iosArLink = document.querySelector('#ios-ar-link');
+            
+            // Show iOS AR link only on iOS devices
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            
+            if (iosArLink) {
+                iosArLink.style.display = isIOS ? 'inline-block' : 'none';
+            }
+        });
+    </script>
 </body>
 </html>`;
 
