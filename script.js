@@ -631,8 +631,8 @@ class ModelShowcase {
         });
 
         if (!response.ok) {
-            // Handle 409 conflict (sha mismatch) by fetching latest sha and retrying once
-            if (response.status === 409) {
+            // Handle 409 conflict (sha mismatch) OR 422 (missing sha) by fetching latest sha and retrying once
+            if (response.status === 409 || response.status === 422) {
                 try {
                     const latestRes = await fetch(apiUrl, {
                         headers: { 'Authorization': `token ${githubToken}` }
@@ -661,7 +661,7 @@ class ModelShowcase {
                     }
                 } catch (e) {
                     const msg = await response.text().catch(()=> '');
-                    throw new Error(`GitHub upload failed: 409 - ${msg}`);
+                    throw new Error(`GitHub upload failed: ${response.status} - ${msg}`);
                 }
             }
             const error = await response.text();
