@@ -595,14 +595,19 @@ class ModelShowcase {
                 existingSha = json.sha;
             }
         } catch (_) {
-            // ignore
+            // ignore CORS or network errors
         }
 
+        // Build PUT body - only include sha if it exists
         const putBody = {
             message: `${existingSha ? 'Update' : 'Add'} ${path}`,
-            content: base64Content,
-            sha: existingSha
+            content: base64Content
         };
+        
+        // Only add sha if file exists (for updates)
+        if (existingSha) {
+            putBody.sha = existingSha;
+        }
 
         const response = await fetch(apiUrl, {
             method: 'PUT',
