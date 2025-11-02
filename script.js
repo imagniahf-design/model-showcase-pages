@@ -2193,12 +2193,19 @@ class ModelPage {
             usdzUrl = usdzUrl.replace('api.github.com/repos/', 'raw.githubusercontent.com/').replace('/contents/', '/').replace('?ref=main', '');
         }
         
-        // Use jsDelivr CDN which serves files with correct MIME types
+        // Convert to GitHub Pages for direct AR (correct MIME types)
         if (usdzUrl && usdzUrl.includes('raw.githubusercontent.com')) {
-            usdzUrl = usdzUrl.replace('raw.githubusercontent.com', 'cdn.jsdelivr.net/gh');
-            // Add filename parameter for iOS AR
-            const modelName = (manifest.name || manifest.title || 'model').replace(/[^a-zA-Z0-9]/g, '_');
-            usdzUrl += `?filename=${modelName}.usdz&allowsContentScaling=1`;
+            usdzUrl = usdzUrl.replace('raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/', 'imagniahf-design.github.io/model-showcase-pages/');
+        }
+        
+        // Convert any jsDelivr URLs to GitHub Pages
+        if (usdzUrl && usdzUrl.includes('cdn.jsdelivr.net')) {
+            usdzUrl = usdzUrl.replace('cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/', 'imagniahf-design.github.io/model-showcase-pages/');
+        }
+        
+        // Remove any hash parameters from URLs
+        if (usdzUrl && usdzUrl.includes('?')) {
+            usdzUrl = usdzUrl.split('?')[0];
         }
 
         return {
@@ -2243,12 +2250,18 @@ class ModelPage {
             if (usdz.includes('api.github.com')) {
                 usdz = usdz.replace('api.github.com/repos/', 'raw.githubusercontent.com/').replace('/contents/', '/').replace('?ref=main', '');
             }
-            // Use jsDelivr CDN for better MIME type support
+            // Convert to GitHub Pages for direct AR
             if (usdz.includes('raw.githubusercontent.com')) {
-                usdz = usdz.replace('raw.githubusercontent.com', 'cdn.jsdelivr.net/gh');
+                usdz = usdz.replace('raw.githubusercontent.com/imagniahf-design/model-showcase-pages/main/', 'imagniahf-design.github.io/model-showcase-pages/');
             }
-            // Don't add filename parameter for direct AR links - iOS handles this better without it
-            // Just ensure it's a clean URL
+            // Convert any jsDelivr URLs to GitHub Pages
+            if (usdz.includes('cdn.jsdelivr.net')) {
+                usdz = usdz.replace('cdn.jsdelivr.net/gh/imagniahf-design/model-showcase-pages@main/', 'imagniahf-design.github.io/model-showcase-pages/');
+            }
+            // Remove any hash parameters
+            if (usdz.includes('?')) {
+                usdz = usdz.split('?')[0];
+            }
         }
         
         const sceneViewer = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(model.glbUrl || '')}&mode=ar_only&title=${encodeURIComponent(model.name || 'Model')}#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
