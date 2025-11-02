@@ -572,6 +572,19 @@ class ModelShowcase {
 
     async uploadToGitHub(path, content) {
         const { githubToken, githubUsername, githubRepo } = this.publishing;
+        
+        // Validate and clean token
+        if (!githubToken || !githubToken.trim()) {
+            throw new Error('GitHub token is missing. Please add it in Storage Settings.');
+        }
+        
+        const cleanToken = githubToken.trim();
+        
+        // Validate token format
+        if (!cleanToken.startsWith('ghp_') && !cleanToken.startsWith('github_pat_')) {
+            throw new Error('Invalid GitHub token format. Token should start with ghp_ or github_pat_');
+        }
+        
         const apiUrl = `https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/${path}`;
         // Convert content to base64 if it's not already
         let base64Content;
@@ -596,7 +609,7 @@ class ModelShowcase {
                 const timeoutId = setTimeout(() => controller.abort(), 2000);
                 
                 const headRes = await fetch(apiUrl, {
-                    headers: { 'Authorization': `token ${githubToken}` },
+                    headers: { 'Authorization': `token ${cleanToken}` },
                     signal: controller.signal
                 });
                 clearTimeout(timeoutId);
@@ -621,21 +634,31 @@ class ModelShowcase {
             putBody.sha = existingSha;
         }
 
-        const response = await fetch(apiUrl, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `token ${githubToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(putBody)
-        });
+        let response;
+        try {
+            response = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${cleanToken}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/vnd.github.v3+json'
+                },
+                body: JSON.stringify(putBody)
+            });
+        } catch (fetchError) {
+            // CORS or network error
+            throw new Error(`Failed to upload to GitHub. This might be a token issue. Please verify your token is valid and has 'repo' permissions. Error: ${fetchError.message}`);
+        }
 
         if (!response.ok) {
             // Handle 409 conflict (sha mismatch) OR 422 (missing sha) by fetching latest sha and retrying once
             if (response.status === 409 || response.status === 422) {
                 try {
                     const latestRes = await fetch(apiUrl, {
-                        headers: { 'Authorization': `token ${githubToken}` }
+                        headers: { 
+                            'Authorization': `token ${cleanToken}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
                     });
                     if (latestRes.ok) {
                         const latestJson = await latestRes.json();
@@ -647,8 +670,9 @@ class ModelShowcase {
                         const retry = await fetch(apiUrl, {
                             method: 'PUT',
                             headers: {
-                                'Authorization': `token ${githubToken}`,
-                                'Content-Type': 'application/json'
+                                'Authorization': `token ${cleanToken}`,
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/vnd.github.v3+json'
                             },
                             body: JSON.stringify(retryBody)
                         });
