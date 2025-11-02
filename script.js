@@ -1272,13 +1272,12 @@ class ModelShowcase {
         </header>
         
         <main style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
-            <div style="background: #1e293b; border-radius: 1rem; padding: 1rem; margin-bottom: 2rem;">
+            <div style="background: #1e293b; border-radius: 1rem; padding: 1rem; margin-bottom: 2rem; position: relative;">
                 <model-viewer 
-                    src="${model.glbUrl || '#'}" 
-                    ios-src="${model.usdzUrl || '#'}"
+                    src="${model.glbUrl || '#'}"
                     alt="${model.name}"
                     ar 
-                    ar-modes="scene-viewer quick-look webxr" 
+                    ar-modes="scene-viewer webxr" 
                     camera-controls 
                     auto-rotate 
                     autoplay
@@ -1288,25 +1287,30 @@ class ModelShowcase {
                     ar-scale="auto"
                     interaction-policy="allow-when-focused"
                     style="width: 100%; height: 500px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
-                    
-                    <button slot="ar-button" style="
-                        position: absolute;
-                        bottom: 16px;
-                        left: 50%;
-                        transform: translateX(-50%);
-                        padding: 12px 24px;
-                        font-size: 16px;
-                        font-weight: bold;
-                        background: #000;
-                        color: #fff;
-                        border: none;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                    ">
-                        START AR
-                    </button>
                 </model-viewer>
+                
+                <!-- iOS Quick Look direct link -->
+                <a href="${model.usdzUrl || '#'}" rel="ar" class="ios-ar-link" id="ios-ar-link" style="
+                    display: none;
+                    position: absolute;
+                    bottom: 16px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    padding: 12px 24px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    background: #007AFF;
+                    color: #fff;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                    text-decoration: none;
+                    z-index: 1000;
+                    pointer-events: auto;
+                ">
+                    📱 Start AR (iOS)
+                </a>
             </div>
             
             <div style="text-align: center;">
@@ -1367,22 +1371,6 @@ class ModelShowcase {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
     <style>
-        .ar-button {
-            position: absolute;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            background: #000;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            z-index: 10;
-        }
         .ios-ar-link {
             display: none;
             position: absolute;
@@ -1409,7 +1397,7 @@ class ModelShowcase {
             background: #0051D5;
         }
         @media (max-width: 768px) {
-            .ar-button, .ios-ar-link {
+            .ios-ar-link {
                 bottom: 8px;
                 padding: 10px 20px;
                 font-size: 14px;
