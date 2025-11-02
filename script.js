@@ -124,6 +124,7 @@ class ModelShowcase {
             if (githubRepo) githubRepo.value = this.publishing.githubRepo || 'model-showcase-pages';
 
             savePublishing?.addEventListener('click', () => {
+                // Update publishing settings
                 this.publishing = {
                     storageType: (document.getElementById('storage-type')?.value) || 'github',
                     githubToken: githubToken.value.trim(),
@@ -136,13 +137,25 @@ class ModelShowcase {
                     keepLocal: keepLocalToggle?.checked !== false,
                     publishOnUpload: publishOnUploadToggle?.checked === true
                 };
+                
+                // Save to localStorage
                 localStorage.setItem('publishing', JSON.stringify(this.publishing));
-                publishingStatus.textContent = '✅ Settings saved successfully!';
+                
+                // Log to console for debugging
+                console.log('Settings saved:', {
+                    storageType: this.publishing.storageType,
+                    githubUsername: this.publishing.githubUsername,
+                    githubRepo: this.publishing.githubRepo,
+                    tokenLength: this.publishing.githubToken?.length || 0,
+                    tokenStart: this.publishing.githubToken?.substring(0, 8) || 'NONE'
+                });
+                
+                publishingStatus.textContent = '✅ Settings saved! Token length: ' + (this.publishing.githubToken?.length || 0);
                 publishingStatus.style.color = '#22c55e';
                 setTimeout(() => {
                     publishingStatus.textContent = '';
                     publishingStatus.style.color = '#718096';
-                }, 3000);
+                }, 5000);
             });
 
             testConnection?.addEventListener('click', async () => {
@@ -573,6 +586,15 @@ class ModelShowcase {
     async uploadToGitHub(path, content) {
         const { githubToken, githubUsername, githubRepo } = this.publishing;
         
+        console.log('Upload attempt:', {
+            path,
+            username: githubUsername,
+            repo: githubRepo,
+            hasToken: !!githubToken,
+            tokenLength: githubToken?.length || 0,
+            tokenStart: githubToken?.substring(0, 8) || 'NONE'
+        });
+        
         // Validate and clean token
         if (!githubToken || !githubToken.trim()) {
             throw new Error('GitHub token is missing. Please add it in Storage Settings.');
@@ -584,6 +606,8 @@ class ModelShowcase {
         if (!cleanToken.startsWith('ghp_') && !cleanToken.startsWith('github_pat_')) {
             throw new Error('Invalid GitHub token format. Token should start with ghp_ or github_pat_');
         }
+        
+        console.log('Token validated successfully:', cleanToken.substring(0, 8) + '...');
         
         const apiUrl = `https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/${path}`;
         // Convert content to base64 if it's not already
