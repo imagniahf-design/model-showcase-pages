@@ -124,12 +124,22 @@ class ModelShowcase {
             if (githubRepo) githubRepo.value = this.publishing.githubRepo || 'model-showcase-pages';
 
             savePublishing?.addEventListener('click', () => {
+                // Get token from input field
+                const tokenValue = githubToken?.value || '';
+                const tokenTrimmed = tokenValue.trim();
+                
+                console.log('BEFORE SAVE - Token from input field:', {
+                    rawLength: tokenValue.length,
+                    trimmedLength: tokenTrimmed.length,
+                    starts: tokenTrimmed.substring(0, 8)
+                });
+                
                 // Update publishing settings
                 this.publishing = {
                     storageType: (document.getElementById('storage-type')?.value) || 'github',
-                    githubToken: githubToken.value.trim(),
-                    githubUsername: githubUsername.value.trim(),
-                    githubRepo: githubRepo.value.trim(),
+                    githubToken: tokenTrimmed,
+                    githubUsername: githubUsername?.value?.trim() || 'imagniahf-design',
+                    githubRepo: githubRepo?.value?.trim() || 'model-showcase-pages',
                     accessKey: cfAccessKey.value.trim(),
                     secretKey: cfSecretKey.value.trim(),
                     accountId: cfAccountId.value.trim(),
@@ -139,24 +149,37 @@ class ModelShowcase {
                 };
                 
                 // Save to localStorage
-                localStorage.setItem('publishing', JSON.stringify(this.publishing));
-                
-                // Log to console for debugging
-                console.log('Settings saved:', {
-                    storageType: this.publishing.storageType,
-                    githubUsername: this.publishing.githubUsername,
-                    githubRepo: this.publishing.githubRepo,
-                    tokenLength: this.publishing.githubToken?.length || 0,
-                    tokenStart: this.publishing.githubToken?.substring(0, 8) || 'NONE'
-                });
-                
-                publishingStatus.textContent = '✅ Settings saved! Token length: ' + (this.publishing.githubToken?.length || 0) + ' - Reloading...';
-                publishingStatus.style.color = '#22c55e';
-                
-                // Reload the page after 1 second to ensure new token is used
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
+                try {
+                    const jsonString = JSON.stringify(this.publishing);
+                    localStorage.setItem('publishing', jsonString);
+                    
+                    // VERIFY it saved by reading it back
+                    const readBack = localStorage.getItem('publishing');
+                    const parsed = JSON.parse(readBack);
+                    
+                    console.log('AFTER SAVE - Verified from localStorage:', {
+                        tokenLength: parsed.githubToken?.length || 0,
+                        tokenStart: parsed.githubToken?.substring(0, 8) || 'NONE',
+                        savedCorrectly: parsed.githubToken === tokenTrimmed
+                    });
+                    
+                    if (parsed.githubToken !== tokenTrimmed) {
+                        throw new Error('Token did not save correctly!');
+                    }
+                    
+                    publishingStatus.textContent = '✅ Token SAVED! Length: ' + tokenTrimmed.length + ' - Reloading in 2s...';
+                    publishingStatus.style.color = '#22c55e';
+                    
+                    // Reload after 2 seconds
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                    
+                } catch (error) {
+                    console.error('SAVE FAILED:', error);
+                    publishingStatus.textContent = '❌ Save failed: ' + error.message;
+                    publishingStatus.style.color = '#ef4444';
+                }
             });
 
             testConnection?.addEventListener('click', async () => {
