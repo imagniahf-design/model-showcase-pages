@@ -84,8 +84,7 @@
                     ar-scale="auto"
                     interaction-policy="allow-when-focused"
                     style="width: 100%; height: 500px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
-                    <button slot="ar-button" class="ar-button">START AR</button>
-                </model-viewer>
+                    </model-viewer>
                 
                 <!-- iOS Quick Look fallback link -->
                 <a href="https://imagniahf-design.github.io/model-showcase-pages/models/model_1760014408249_1dbrz9bhi/model.usdz" rel="ar" class="ios-ar-link" id="ios-ar-link">
@@ -96,27 +95,16 @@
         </main>
     </div>
         <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-    <script>
-        // iOS capability detection and AR button management
+        <script>
+        // iOS AR link visibility
         document.addEventListener('DOMContentLoaded', function() {
-            const modelViewer = document.querySelector('model-viewer');
-            const arButton = document.querySelector('.ar-button');
             const iosArLink = document.querySelector('#ios-ar-link');
             
-            // Check if device supports iOS Quick Look
+            // Show iOS AR link only on iOS devices
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            const supportsQuickLook = isIOS && 'ontouchstart' in window;
-
-            if (supportsQuickLook) {
-                // Hide model-viewer AR button, show native iOS AR link
-                if (arButton) arButton.style.display = 'none';
-                if (iosArLink) {
-                    iosArLink.style.display = 'inline-block';});
-                }
-            } else {
-                // Show model-viewer AR button, hide iOS link
-                if (arButton) arButton.style.display = 'block';
-                if (iosArLink) iosArLink.style.display = 'none';
+            
+            if (iosArLink) {
+                iosArLink.style.display = isIOS ? 'inline-block' : 'none';
             }
         });
     </script>

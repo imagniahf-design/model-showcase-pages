@@ -38,27 +38,16 @@
         </main>
     </div>
         <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-    <script>
-        // iOS capability detection and AR button management
+        <script>
+        // iOS AR link visibility
         document.addEventListener('DOMContentLoaded', function() {
-            const modelViewer = document.querySelector('model-viewer');
-            const arButton = document.querySelector('.ar-button');
             const iosArLink = document.querySelector('#ios-ar-link');
             
-            // Check if device supports iOS Quick Look
+            // Show iOS AR link only on iOS devices
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            const supportsQuickLook = isIOS && 'ontouchstart' in window;
-
-            if (supportsQuickLook) {
-                // Hide model-viewer AR button, show native iOS AR link
-                if (arButton) arButton.style.display = 'none';
-                if (iosArLink) {
-                    iosArLink.style.display = 'inline-block';});
-                }
-            } else {
-                // Show model-viewer AR button, hide iOS link
-                if (arButton) arButton.style.display = 'block';
-                if (iosArLink) iosArLink.style.display = 'none';
+            
+            if (iosArLink) {
+                iosArLink.style.display = isIOS ? 'inline-block' : 'none';
             }
         });
     </script>
