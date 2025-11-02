@@ -150,12 +150,13 @@ class ModelShowcase {
                     tokenStart: this.publishing.githubToken?.substring(0, 8) || 'NONE'
                 });
                 
-                publishingStatus.textContent = '✅ Settings saved! Token length: ' + (this.publishing.githubToken?.length || 0);
+                publishingStatus.textContent = '✅ Settings saved! Token length: ' + (this.publishing.githubToken?.length || 0) + ' - Reloading...';
                 publishingStatus.style.color = '#22c55e';
+                
+                // Reload the page after 1 second to ensure new token is used
                 setTimeout(() => {
-                    publishingStatus.textContent = '';
-                    publishingStatus.style.color = '#718096';
-                }, 5000);
+                    window.location.reload();
+                }, 1000);
             });
 
             testConnection?.addEventListener('click', async () => {
