@@ -585,17 +585,29 @@ class ModelShowcase {
         }
 
         // Check if file exists to include sha for updates (avoid 422)
+        // Skip check if running from GitHub Pages (CORS blocked)
         let existingSha = undefined;
-        try {
-            const headRes = await fetch(apiUrl, {
-                headers: { 'Authorization': `token ${githubToken}` }
-            });
-            if (headRes.ok) {
-                const json = await headRes.json();
-                existingSha = json.sha;
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        
+        if (!isGitHubPages) {
+            try {
+                // Add 2 second timeout to avoid hanging
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 2000);
+                
+                const headRes = await fetch(apiUrl, {
+                    headers: { 'Authorization': `token ${githubToken}` },
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                
+                if (headRes.ok) {
+                    const json = await headRes.json();
+                    existingSha = json.sha;
+                }
+            } catch (_) {
+                // ignore CORS, timeout or network errors
             }
-        } catch (_) {
-            // ignore CORS or network errors
         }
 
         // Build PUT body - only include sha if it exists
