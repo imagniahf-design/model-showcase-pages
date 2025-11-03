@@ -1441,23 +1441,50 @@ class ModelShowcase {
     
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <script>
-        // iOS Quick Look INSTANT Launch
+        // iOS Quick Look - NO intermediate pages, NO lag
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        
+        // Preload USDZ on iOS for instant AR
+        if (isIOS) {
+            const usdzUrl = '${model.usdzUrl || ''}';
+            if (usdzUrl) {
+                const link = document.createElement('link');
+                link.rel = 'prefetch';
+                link.href = usdzUrl;
+                link.as = 'fetch';
+                document.head.appendChild(link);
+            }
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             const iosArLink = document.querySelector('#ios-ar-link');
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             
             if (iosArLink) {
                 // Show AR button on ALL devices
                 iosArLink.style.display = 'inline-block';
                 
                 if (isIOS) {
-                    // iOS: Direct navigation for instant AR
-                    iosArLink.addEventListener('touchend', function(e) {
+                    // iOS: Multiple event handlers for reliability
+                    const launchAR = function(e) {
                         e.preventDefault();
-                        e.stopPropagation();
-                        window.location.href = this.href;
-                        console.log('Quick Look launching:', this.href);
-                    }, { passive: false });
+                        e.stopImmediatePropagation();
+                        
+                        const url = iosArLink.href;
+                        
+                        // Create a hidden anchor and click it (Apple's recommended method)
+                        const tempAnchor = document.createElement('a');
+                        tempAnchor.href = url;
+                        tempAnchor.rel = 'ar';
+                        tempAnchor.style.display = 'none';
+                        document.body.appendChild(tempAnchor);
+                        tempAnchor.click();
+                        setTimeout(() => document.body.removeChild(tempAnchor), 100);
+                        
+                        return false;
+                    };
+                    
+                    iosArLink.addEventListener('click', launchAR, { capture: true, passive: false });
+                    iosArLink.addEventListener('touchstart', launchAR, { capture: true, passive: false });
                 }
             }
         });
@@ -1569,23 +1596,48 @@ class ModelShowcase {
     </div>
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <script>
-        // iOS Quick Look INSTANT Launch
+        // iOS Quick Look - NO intermediate pages, NO lag
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        
+        // Preload USDZ on iOS for instant AR
+        if (isIOS) {
+            const usdzUrl = '${iosUsdzUrl}';
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.href = usdzUrl;
+            link.as = 'fetch';
+            document.head.appendChild(link);
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             const iosArLink = document.querySelector('#ios-ar-link');
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             
             if (iosArLink) {
                 // Show AR button on ALL devices
                 iosArLink.style.display = 'inline-block';
                 
                 if (isIOS) {
-                    // iOS: Direct navigation for instant AR
-                    iosArLink.addEventListener('touchend', function(e) {
+                    // iOS: Multiple event handlers for reliability
+                    const launchAR = function(e) {
                         e.preventDefault();
-                        e.stopPropagation();
-                        window.location.href = this.href;
-                        console.log('Quick Look launching:', this.href);
-                    }, { passive: false });
+                        e.stopImmediatePropagation();
+                        
+                        const url = iosArLink.href;
+                        
+                        // Create a hidden anchor and click it (Apple's recommended method)
+                        const tempAnchor = document.createElement('a');
+                        tempAnchor.href = url;
+                        tempAnchor.rel = 'ar';
+                        tempAnchor.style.display = 'none';
+                        document.body.appendChild(tempAnchor);
+                        tempAnchor.click();
+                        setTimeout(() => document.body.removeChild(tempAnchor), 100);
+                        
+                        return false;
+                    };
+                    
+                    iosArLink.addEventListener('click', launchAR, { capture: true, passive: false });
+                    iosArLink.addEventListener('touchstart', launchAR, { capture: true, passive: false });
                 }
             }
         });
