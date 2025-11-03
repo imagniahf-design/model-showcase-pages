@@ -1441,24 +1441,27 @@ class ModelShowcase {
     
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <script>
-        // iOS Quick Look Direct Launch
+        // iOS Quick Look INSTANT Launch
         document.addEventListener('DOMContentLoaded', function() {
             const iosArLink = document.querySelector('#ios-ar-link');
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             
-            if (iosArLink) {
-                if (isIOS) {
-                    // Show AR button on iOS
-                    iosArLink.style.display = 'inline-block';
+            if (iosArLink && isIOS) {
+                // Show AR button on iOS only
+                iosArLink.style.display = 'inline-block';
+                
+                // Immediate AR launch - no delays
+                iosArLink.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     
-                    // Ensure direct Quick Look launch (no intermediate pages)
-                    iosArLink.addEventListener('click', function(e) {
-                        // Let the browser handle it natively - this ensures Quick Look opens directly
-                        console.log('Launching AR Quick Look directly...');
-                    });
-                } else {
-                    iosArLink.style.display = 'none';
-                }
+                    // Direct navigation to USDZ file
+                    window.location.href = this.href;
+                    
+                    console.log('Quick Look launching:', this.href);
+                }, { passive: false });
+            } else if (iosArLink) {
+                iosArLink.style.display = 'none';
             }
         });
     </script>
@@ -1569,24 +1572,27 @@ class ModelShowcase {
     </div>
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <script>
-        // iOS Quick Look Direct Launch
+        // iOS Quick Look INSTANT Launch
         document.addEventListener('DOMContentLoaded', function() {
             const iosArLink = document.querySelector('#ios-ar-link');
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             
-            if (iosArLink) {
-                if (isIOS) {
-                    // Show AR button on iOS
-                    iosArLink.style.display = 'inline-block';
+            if (iosArLink && isIOS) {
+                // Show AR button on iOS only
+                iosArLink.style.display = 'inline-block';
+                
+                // Immediate AR launch - no delays
+                iosArLink.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     
-                    // Ensure direct Quick Look launch (no intermediate pages)
-                    iosArLink.addEventListener('click', function(e) {
-                        // Let the browser handle it natively - this ensures Quick Look opens directly
-                        console.log('Launching AR Quick Look directly...');
-                    });
-                } else {
-                    iosArLink.style.display = 'none';
-                }
+                    // Direct navigation to USDZ file
+                    window.location.href = this.href;
+                    
+                    console.log('Quick Look launching:', this.href);
+                }, { passive: false });
+            } else if (iosArLink) {
+                iosArLink.style.display = 'none';
             }
         });
     </script>
