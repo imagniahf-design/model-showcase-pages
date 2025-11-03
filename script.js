@@ -1417,9 +1417,8 @@ class ModelShowcase {
                 </model-viewer>
                 
                 <!-- iOS Quick Look - Direct AR Launch -->
-                <a href="${model.usdzUrl || '#'}#allowsContentScaling=0" rel="ar" class="ios-ar-link" id="ios-ar-link">
-                    <img src="${model.previewImage}" alt="View in AR" style="display: none;">
-                    📱 Start AR (iOS)
+                <a href="${model.usdzUrl || '#'}" rel="ar" class="ios-ar-link" id="ios-ar-link">
+                    📱 Start AR
                 </a>
             </div>
             
@@ -1562,9 +1561,8 @@ class ModelShowcase {
                 </model-viewer>
                 
                 <!-- iOS Quick Look - Direct AR Launch -->
-                <a href="${iosUsdzUrl}#allowsContentScaling=0" rel="ar" class="ios-ar-link" id="ios-ar-link">
-                    <img src="${rawPosterUrl}" alt="View in AR" style="display: none;">
-                    📱 Start AR (iOS)
+                <a href="${iosUsdzUrl}" rel="ar" class="ios-ar-link" id="ios-ar-link">
+                    📱 Start AR
                 </a>
             </div>
         </main>
