@@ -1446,22 +1446,19 @@ class ModelShowcase {
             const iosArLink = document.querySelector('#ios-ar-link');
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             
-            if (iosArLink && isIOS) {
-                // Show AR button on iOS only
+            if (iosArLink) {
+                // Show AR button on ALL devices
                 iosArLink.style.display = 'inline-block';
                 
-                // Immediate AR launch - no delays
-                iosArLink.addEventListener('touchend', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    // Direct navigation to USDZ file
-                    window.location.href = this.href;
-                    
-                    console.log('Quick Look launching:', this.href);
-                }, { passive: false });
-            } else if (iosArLink) {
-                iosArLink.style.display = 'none';
+                if (isIOS) {
+                    // iOS: Direct navigation for instant AR
+                    iosArLink.addEventListener('touchend', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.location.href = this.href;
+                        console.log('Quick Look launching:', this.href);
+                    }, { passive: false });
+                }
             }
         });
     </script>
@@ -1577,22 +1574,19 @@ class ModelShowcase {
             const iosArLink = document.querySelector('#ios-ar-link');
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             
-            if (iosArLink && isIOS) {
-                // Show AR button on iOS only
+            if (iosArLink) {
+                // Show AR button on ALL devices
                 iosArLink.style.display = 'inline-block';
                 
-                // Immediate AR launch - no delays
-                iosArLink.addEventListener('touchend', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    // Direct navigation to USDZ file
-                    window.location.href = this.href;
-                    
-                    console.log('Quick Look launching:', this.href);
-                }, { passive: false });
-            } else if (iosArLink) {
-                iosArLink.style.display = 'none';
+                if (isIOS) {
+                    // iOS: Direct navigation for instant AR
+                    iosArLink.addEventListener('touchend', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.location.href = this.href;
+                        console.log('Quick Look launching:', this.href);
+                    }, { passive: false });
+                }
             }
         });
     </script>
