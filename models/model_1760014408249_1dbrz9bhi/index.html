@@ -99,10 +99,10 @@
             const iosArLink = document.querySelector('#ios-ar-link');
             
             if (iosArLink) {
-                // Show AR button on ALL devices
-                iosArLink.style.display = 'inline-block';
-                
                 if (isIOS) {
+                    // iOS ONLY: Show button and set up instant launch
+                    iosArLink.style.display = 'inline-block';
+                    
                     // iOS: Multiple event handlers for reliability
                     const launchAR = function(e) {
                         e.preventDefault();
@@ -124,6 +124,9 @@
                     
                     iosArLink.addEventListener('click', launchAR, { capture: true, passive: false });
                     iosArLink.addEventListener('touchstart', launchAR, { capture: true, passive: false });
+                } else {
+                    // Android: Hide iOS button (model-viewer handles AR)
+                    iosArLink.style.display = 'none';
                 }
             }
         });
