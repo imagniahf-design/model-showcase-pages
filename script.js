@@ -1416,8 +1416,9 @@ class ModelShowcase {
                     style="width: 100%; height: 500px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
                 </model-viewer>
                 
-                <!-- iOS Quick Look direct link -->
-                <a href="${model.usdzUrl || '#'}" rel="ar" class="ios-ar-link" id="ios-ar-link">
+                <!-- iOS Quick Look - Direct AR Launch -->
+                <a href="${model.usdzUrl || '#'}#allowsContentScaling=0" rel="ar" class="ios-ar-link" id="ios-ar-link">
+                    <img src="${model.previewImage}" alt="View in AR" style="display: none;">
                     📱 Start AR (iOS)
                 </a>
             </div>
@@ -1441,15 +1442,24 @@ class ModelShowcase {
     
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <script>
-        // iOS AR link visibility
+        // iOS Quick Look Direct Launch
         document.addEventListener('DOMContentLoaded', function() {
             const iosArLink = document.querySelector('#ios-ar-link');
-            
-            // Show iOS AR link only on iOS devices
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             
             if (iosArLink) {
-                iosArLink.style.display = isIOS ? 'inline-block' : 'none';
+                if (isIOS) {
+                    // Show AR button on iOS
+                    iosArLink.style.display = 'inline-block';
+                    
+                    // Ensure direct Quick Look launch (no intermediate pages)
+                    iosArLink.addEventListener('click', function(e) {
+                        // Let the browser handle it natively - this ensures Quick Look opens directly
+                        console.log('Launching AR Quick Look directly...');
+                    });
+                } else {
+                    iosArLink.style.display = 'none';
+                }
             }
         });
     </script>
@@ -1551,8 +1561,9 @@ class ModelShowcase {
                     style="width: 100%; height: 500px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
                 </model-viewer>
                 
-                <!-- iOS Quick Look direct link -->
-                <a href="${iosUsdzUrl}" rel="ar" class="ios-ar-link" id="ios-ar-link">
+                <!-- iOS Quick Look - Direct AR Launch -->
+                <a href="${iosUsdzUrl}#allowsContentScaling=0" rel="ar" class="ios-ar-link" id="ios-ar-link">
+                    <img src="${rawPosterUrl}" alt="View in AR" style="display: none;">
                     📱 Start AR (iOS)
                 </a>
             </div>
@@ -1560,15 +1571,24 @@ class ModelShowcase {
     </div>
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <script>
-        // iOS AR link visibility
+        // iOS Quick Look Direct Launch
         document.addEventListener('DOMContentLoaded', function() {
             const iosArLink = document.querySelector('#ios-ar-link');
-            
-            // Show iOS AR link only on iOS devices
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             
             if (iosArLink) {
-                iosArLink.style.display = isIOS ? 'inline-block' : 'none';
+                if (isIOS) {
+                    // Show AR button on iOS
+                    iosArLink.style.display = 'inline-block';
+                    
+                    // Ensure direct Quick Look launch (no intermediate pages)
+                    iosArLink.addEventListener('click', function(e) {
+                        // Let the browser handle it natively - this ensures Quick Look opens directly
+                        console.log('Launching AR Quick Look directly...');
+                    });
+                } else {
+                    iosArLink.style.display = 'none';
+                }
             }
         });
     </script>
