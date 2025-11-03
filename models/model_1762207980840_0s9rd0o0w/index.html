@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!-- Version: 1762207997369 - GitHub Pages Direct AR -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>3DModel - 3D Model</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+    <style>
+        .ios-ar-link {
+            display: none;
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            background: #007AFF;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            text-decoration: none;
+            z-index: 1000;
+            pointer-events: auto;
+            -webkit-tap-highlight-color: rgba(0, 122, 255, 0.3);
+            touch-action: manipulation;
+        }
+        .ios-ar-link:active {
+            transform: translateX(-50%) scale(0.95);
+            background: #0051D5;
+        }
+        @media (max-width: 768px) {
+            .ios-ar-link {
+                bottom: 8px;
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div style="background: #0f172a; color: white; font-family: Inter, sans-serif; min-height: 100vh;">
+        <header style="padding: 1rem; text-align: center; border-bottom: 1px solid #1e293b;">
+            <h1 style="margin: 0; font-size: 1.5rem;">🎯 3DModel</h1>
+            
+        </header>
+        <main style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
+            <div style="background: #1e293b; border-radius: 1rem; padding: 1rem; margin-bottom: 2rem; position: relative;">
+                <model-viewer 
+                    src="https://imagniahf-design.github.io/model-showcase-pages/models/model_1762207980840_0s9rd0o0w/model.glb"
+                    alt="3DModel"
+                    ar 
+                    ar-modes="scene-viewer webxr" 
+                    camera-controls 
+                    auto-rotate 
+                    autoplay
+                    environment-image="neutral" 
+                    poster="https://imagniahf-design.github.io/model-showcase-pages/models/model_1762207980840_0s9rd0o0w/poster.jpg"
+                    ar-placement="floor"
+                    ar-scale="auto"
+                    interaction-policy="allow-when-focused"
+                    style="width: 100%; height: 500px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+                </model-viewer>
+                
+                <!-- iOS Quick Look - Direct AR Launch -->
+                <a href="https://imagniahf-design.github.io/model-showcase-pages/models/model_1762207980840_0s9rd0o0w/model.usdz" rel="ar" class="ios-ar-link" id="ios-ar-link">
+                    📱 Start AR
+                </a>
+            </div>
+        </main>
+    </div>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <script>
+        // iOS Quick Look INSTANT Launch
+        document.addEventListener('DOMContentLoaded', function() {
+            const iosArLink = document.querySelector('#ios-ar-link');
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            
+            if (iosArLink) {
+                // Show AR button on ALL devices
+                iosArLink.style.display = 'inline-block';
+                
+                if (isIOS) {
+                    // iOS: Direct navigation for instant AR
+                    iosArLink.addEventListener('touchend', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.location.href = this.href;
+                        console.log('Quick Look launching:', this.href);
+                    }, { passive: false });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
